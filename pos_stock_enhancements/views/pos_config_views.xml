@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_config_view_form_stock_enhancements" model="ir.ui.view">
+        <field name="name">pos.config.form.stock.enhancements</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <div id="inventory_location" position="after">
+                <h2>Stock Availability</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="enforce_pos_stock_check"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="enforce_pos_stock_check"/>
+                            <div class="text-muted">
+                                Enable real-time stock checking for products.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box"
+                         attrs="{'invisible': [('enforce_pos_stock_check', '=', False)]}">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <label for="available_stock_location_ids" class="o_light_label"/>
+                            <field name="available_stock_location_ids" widget="many2many_tags"
+                                   options="{'no_create_edit': True}"
+                                   domain="[('usage', '=', 'internal')]"
+                                   attrs="{'required': [('enforce_pos_stock_check', '=', True)]}"/>
+                            <div class="text-muted">
+                                Select specific stock locations to check for product availability. If empty and stock check is enforced, products might be considered out of stock.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </field>
+    </record>
+</odoo>
