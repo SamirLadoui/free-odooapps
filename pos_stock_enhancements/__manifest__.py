@@ -41,6 +41,8 @@ For a more detailed guide, including screenshots and setup instructions, please 
         'views/pos_assets.xml',
     ],
 
+    'images': ['static/description/banner.gif'],
+
     'installable': True,
     'application': False
 }
