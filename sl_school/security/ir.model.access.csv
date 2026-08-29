@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_academic_year_user,sl.academic.year.user,model_sl_academic_year,group_school_user,1,0,0,0
+access_academic_year_manager,sl.academic.year.manager,model_sl_academic_year,group_school_manager,1,1,1,1
+access_subject_user,sl.subject.user,model_sl_subject,group_school_user,1,0,0,0
+access_subject_manager,sl.subject.manager,model_sl_subject,group_school_manager,1,1,1,1
+access_school_standard_user,sl.school.standard.user,model_sl_school_standard,group_school_user,1,0,0,0
+access_school_standard_manager,sl.school.standard.manager,model_sl_school_standard,group_school_manager,1,1,1,1
+access_teacher_user,sl.teacher.user,model_sl_teacher,group_school_user,1,0,0,0
+access_teacher_manager,sl.teacher.manager,model_sl_teacher,group_school_manager,1,1,1,1
+access_student_user,sl.student.user,model_sl_student,group_school_user,1,1,1,0
+access_student_manager,sl.student.manager,model_sl_student,group_school_manager,1,1,1,1

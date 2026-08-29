@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_teacher_list" model="ir.ui.view">
+        <field name="name">sl.teacher.list</field>
+        <field name="model">sl.teacher</field>
+        <field name="arch" type="xml">
+            <list string="Teachers">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="subject_ids" widget="many2many_tags" optional="show"/>
+                <field name="standard_count" string="Classes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_teacher_form" model="ir.ui.view">
+        <field name="name">sl.teacher.form</field>
+        <field name="model">sl.teacher</field>
+        <field name="arch" type="xml">
+            <form string="Teacher">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Full name"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Contact">
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group string="Employment">
+                            <field name="joining_date"/>
+                            <field name="qualification"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Subjects" name="subjects">
+                            <field name="subject_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Classes Managed" name="standards">
+                            <field name="standard_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="division"/>
+                                    <field name="academic_year_id"/>
+                                    <field name="student_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_teacher" model="ir.actions.act_window">
+        <field name="name">Teachers</field>
+        <field name="res_model">sl.teacher</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
