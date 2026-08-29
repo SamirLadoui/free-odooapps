@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_contract_list" model="ir.ui.view">
+        <field name="name">sl.contract.list</field>
+        <field name="model">sl.contract</field>
+        <field name="arch" type="xml">
+            <tree string="Contracts" decoration-muted="state in ('closed', 'cancelled')"
+                  decoration-success="state == 'open'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_start"/>
+                <field name="date_end" optional="show"/>
+                <field name="next_invoice_date"/>
+                <field name="amount_total" widget="monetary"/>
+                <field name="currency_id" column_invisible="1"/><!-- drives the monetary widget -->
+                <field name="state" widget="badge"
+                       decoration-success="state == 'open'"
+                       decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_contract_form" model="ir.ui.view">
+        <field name="name">sl.contract.form</field>
+        <field name="model">sl.contract</field>
+        <field name="arch" type="xml">
+            <form string="Contract">
+                <header>
+                    <button name="action_start" type="object" string="Start"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_create_invoice" type="object"
+                            string="Invoice Now" class="btn-primary"
+                            invisible="state != 'open'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'open'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('closed', 'cancelled')"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reset to Draft"
+                            invisible="state not in ('closed', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object"
+                                class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Monthly support retainer"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Customer">
+                            <field name="partner_id"/>
+                            <field name="payment_term_id"/>
+                            <field name="journal_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/><!-- currency for monetary widgets -->
+                        </group>
+                        <group string="Recurrence">
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <label for="recurring_interval" string="Invoice Every"/>
+                            <div class="o_row">
+                                <field name="recurring_interval" class="oe_inline"/>
+                                <field name="recurring_rule_type" class="oe_inline"/>
+                            </div>
+                            <field name="recurring_invoicing_type"/>
+                            <field name="next_invoice_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines" name="lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" optional="show"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount" optional="show"/>
+                                    <field name="date_start" optional="hide"/>
+                                    <field name="date_end" optional="hide"/>
+                                    <field name="price_subtotal" widget="monetary"/>
+                                    <field name="currency_id" column_invisible="1"/><!-- drives the monetary widget -->
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_total" widget="monetary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_contract_search" model="ir.ui.view">
+        <field name="name">sl.contract.search</field>
+        <field name="model">sl.contract</field>
+        <field name="arch" type="xml">
+            <search string="Contracts">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <filter name="filter_open" string="Running"
+                        domain="[('state', '=', 'open')]"/>
+                <filter name="filter_due" string="Due For Invoicing"
+                        domain="[('state', '=', 'open'), ('next_invoice_date', '&lt;=', 'today')]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_partner" string="Customer"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_next" string="Next Invoice"
+                            context="{'group_by': 'next_invoice_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_contract" model="ir.actions.act_window">
+        <field name="name">Contracts</field>
+        <field name="res_model">sl.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first contract</p>
+            <p>
+                Set the lines and the recurrence, press Start, and invoices are
+                generated on schedule. The next invoice date is always visible,
+                so you can see exactly what is coming.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_contract" name="Contracts"
+              parent="account.menu_finance_receivables" action="action_contract"
+              sequence="25"/>
+
+</odoo>
