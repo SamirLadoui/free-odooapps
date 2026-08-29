@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mass_editing_admin,sl.mass.editing.admin,model_sl_mass_editing,base.group_system,1,1,1,1
+access_mass_editing_user,sl.mass.editing.user,model_sl_mass_editing,base.group_user,1,0,0,0
+access_mass_editing_wizard,sl.mass.editing.wizard,model_sl_mass_editing_wizard,base.group_user,1,1,1,1
+access_mass_editing_line,sl.mass.editing.line,model_sl_mass_editing_line,base.group_user,1,1,1,1
