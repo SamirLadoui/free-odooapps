@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 16.0 builds the settings page out of o_setting_box divs; 17.0 replaced that
+     with <block>/<setting>. A genuine structural fork, not a mechanical port. -->
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sl.google.maps</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='companies']" position="after">
+                <div id="sl_google_maps">
+                    <h2>Google Maps</h2>
+                    <div class="row mt16 o_settings_container" name="sl_google_maps_container">
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_google_maps_key_setting">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">API Key</span>
+                                <div class="text-muted">
+                                    Optional. Without a key, map buttons open google.com/maps
+                                    in a new tab. With one, maps are embedded in Odoo.
+                                </div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="google_maps_api_key" class="col-lg-5 o_light_label"/>
+                                        <field name="google_maps_api_key" password="True"
+                                               placeholder="AIza..."/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label for="google_maps_zoom" class="col-lg-5 o_light_label"/>
+                                        <field name="google_maps_zoom"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

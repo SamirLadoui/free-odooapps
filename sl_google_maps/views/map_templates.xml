@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="partner_map_page" name="Partner Map">
+        <t t-call="web.frontend_layout">
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+            <t t-set="title" t-value="partner.display_name"/>
+
+            <div class="sl_map">
+                <div class="sl_map_bar">
+                    <div class="sl_map_meta">
+                        <span class="sl_map_name" t-out="partner.display_name"/>
+                        <span class="sl_map_sub" t-out="partner._map_query()"/>
+                    </div>
+                    <div class="sl_map_actions">
+                        <a t-att-href="directions_url" target="_blank"
+                           class="btn btn-secondary btn-sm">Directions</a>
+                        <a t-att-href="search_url" target="_blank"
+                           class="btn btn-primary btn-sm">Open in Google Maps</a>
+                    </div>
+                </div>
+                <div class="sl_map_body">
+                    <iframe t-if="embed_url" class="sl_map_frame" t-att-src="embed_url"
+                            loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            t-att-title="partner.display_name"/>
+                    <div t-else="" class="sl_map_empty">
+                        <h4>No API key configured</h4>
+                        <p class="text-muted">
+                            Set a Google Maps API key in Settings to embed maps here.
+                            Until then, use the button above to open Google Maps.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="partners_map_page" name="Partners Map">
+        <t t-call="web.frontend_layout">
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+            <t t-set="title">Selected Contacts</t>
+
+            <div class="sl_map">
+                <div class="sl_map_bar">
+                    <div class="sl_map_meta">
+                        <span class="sl_map_name">
+                            <t t-out="len(partners)"/> contact(s)
+                        </span>
+                        <span class="sl_map_sub" t-if="skipped">
+                            <t t-out="skipped"/> skipped for having no address
+                        </span>
+                    </div>
+                </div>
+                <div class="sl_map_body sl_map_body_split">
+                    <div class="sl_map_canvas_wrap">
+                        <div t-if="api_key" id="sl_map_canvas" class="sl_map_canvas"
+                             t-att-data-markers="markers"
+                             t-att-data-base-url="base_url"/>
+                        <img t-elif="static_url" t-att-src="static_url"
+                             alt="Map of selected contacts"/>
+                        <div t-else="" class="sl_map_empty">
+                            <h4>No API key configured</h4>
+                            <p class="text-muted">
+                                Set a Google Maps API key in Settings to see these
+                                contacts on a map. The list beside this still links
+                                each one straight to Google Maps.
+                            </p>
+                        </div>
+                    </div>
+                    <ol class="sl_map_list">
+                        <li t-foreach="partners" t-as="partner">
+                            <strong t-out="partner.display_name"/>
+                            <div class="text-muted small" t-out="partner._map_query()"/>
+                            <a t-att-href="partner._map_search_url()" target="_blank"
+                               class="small">Open in Google Maps</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <script t-if="api_key" type="text/javascript"
+                    t-attf-src="https://maps.googleapis.com/maps/api/js?key=#{api_key}&amp;callback=slInitMap"
+                    async="async" defer="defer"/>
+            <script t-if="api_key" type="text/javascript">
+                function slInitMap() {
+                    var host = document.getElementById("sl_map_canvas");
+                    if (!host) { return; }
+                    var markers = JSON.parse(host.dataset.markers || "[]");
+                    var baseUrl = host.dataset.baseUrl || "";
+                    var map = new google.maps.Map(host, {
+                        zoom: 6,
+                        center: markers.length
+                            ? {lat: markers[0].lat, lng: markers[0].lng}
+                            : {lat: 0, lng: 0},
+                        mapTypeControl: false
+                    });
+                    var bounds = new google.maps.LatLngBounds();
+                    var info = new google.maps.InfoWindow();
+                    markers.forEach(function (entry) {
+                        var position = {lat: entry.lat, lng: entry.lng};
+                        var marker = new google.maps.Marker({
+                            position: position, map: map, title: entry.name
+                        });
+                        bounds.extend(position);
+                        marker.addListener("click", function () {
+                            var link = baseUrl + "/odoo/res.partner/" + entry.id;
+                            info.setContent(
+                                "&lt;strong&gt;" + entry.name + "&lt;/strong&gt;&lt;br/&gt;" +
+                                (entry.address || "") +
+                                "&lt;br/&gt;&lt;a target=\"_blank\" href=\"" + link + "\"&gt;Open record&lt;/a&gt;"
+                            );
+                            info.open(map, marker);
+                        });
+                    });
+                    if (markers.length &gt; 1) { map.fitBounds(bounds); }
+                }
+            </script>
+        </t>
+    </template>
+
+</odoo>
