@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sl_google_maps.PlacesAutocompleteField">
+        <input type="text" class="o_input" t-ref="input"
+               t-att-id="props.id"
+               t-att-placeholder="props.placeholder"
+               t-att-readonly="props.readonly"
+               autocomplete="off"/>
+    </t>
+
+</templates>
