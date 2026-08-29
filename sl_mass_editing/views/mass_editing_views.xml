@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 16.0 fork: the archive ribbon needs attrs rather than a python expression. -->
+<odoo>
+
+    <record id="view_mass_editing_list" model="ir.ui.view">
+        <field name="name">sl.mass.editing.list</field>
+        <field name="model">sl.mass.editing</field>
+        <field name="arch" type="xml">
+            <tree string="Bulk Edits">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="field_ids" widget="many2many_tags" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_mass_editing_form" model="ir.ui.view">
+        <field name="name">sl.mass.editing.form</field>
+        <field name="model">sl.mass.editing</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Edit">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Reassign salesperson"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="model_id" options="{'no_create': True}"/>
+                            <field name="model_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="action_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Editable Fields">
+                        <field name="field_ids" widget="many2many_tags" nolabel="1"
+                               options="{'no_create': True}"/>
+                    </group>
+                    <div class="alert alert-info" role="status">
+                        Once saved, this appears in the <b>Action</b> menu of the model's
+                        list view. Select some records there, pick it, and you get a form
+                        limited to the fields chosen above.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_mass_editing_search" model="ir.ui.view">
+        <field name="name">sl.mass.editing.search</field>
+        <field name="model">sl.mass.editing</field>
+        <field name="arch" type="xml">
+            <search string="Bulk Edits">
+                <field name="name"/>
+                <field name="model_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_model" string="Model"
+                            context="{'group_by': 'model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mass_editing" model="ir.actions.act_window">
+        <field name="name">Bulk Edits</field>
+        <field name="res_model">sl.mass.editing</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define your first bulk edit</p>
+            <p>
+                Pick a model and the fields that may be changed on it. The entry then
+                appears in that model's Action menu, and only the fields you chose can
+                be touched through it.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_mass_editing" name="Bulk Edits"
+              parent="base.menu_custom" action="action_mass_editing" sequence="50"/>
+
+</odoo>

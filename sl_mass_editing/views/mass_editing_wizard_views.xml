@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 16.0 has no python-expression invisible/required on fields and no
+     column_invisible, so this view is a structural fork of the 17.0+ one. -->
+<odoo>
+
+    <record id="view_mass_editing_wizard_form" model="ir.ui.view">
+        <field name="name">sl.mass.editing.wizard.form</field>
+        <field name="model">sl.mass.editing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Edit">
+                <field name="mass_edit_id" invisible="1"/>
+                <field name="model_name" invisible="1"/>
+                <div class="alert alert-warning" role="alert">
+                    This will change <field name="record_count" class="oe_inline"/>
+                    selected record(s). There is no undo.
+                </div>
+                <field name="line_ids">
+                    <tree editable="bottom">
+                        <field name="allowed_field_ids" invisible="1"/>
+                        <field name="field_id" options="{'no_create': True}"
+                               domain="[('id', 'in', allowed_field_ids)]"/>
+                        <field name="field_type" invisible="1"/>
+                        <field name="field_relation" invisible="1"/>
+                        <field name="operation"/>
+                        <field name="value_reference"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', 'not in', ['many2one', 'many2many'])],
+                                       'required': [('operation', '!=', 'clear'), ('field_type', 'in', ['many2one', 'many2many'])]}"/>
+                        <field name="value_char"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', '!=', 'char')]}"/>
+                        <field name="value_text"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', 'not in', ['text', 'html'])]}"/>
+                        <field name="value_integer"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', '!=', 'integer')]}"/>
+                        <field name="value_float"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', 'not in', ['float', 'monetary'])]}"/>
+                        <field name="value_boolean"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', '!=', 'boolean')]}"/>
+                        <field name="value_date"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', '!=', 'date')]}"/>
+                        <field name="value_datetime"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', '!=', 'datetime')]}"/>
+                        <field name="value_selection"
+                               attrs="{'invisible': ['|', ('operation', '=', 'clear'), ('field_type', '!=', 'selection')]}"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary"
+                            confirm="Apply these changes to every selected record?"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
