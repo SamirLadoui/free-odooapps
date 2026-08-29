@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sl_stock_export_wizard_form" model="ir.ui.view">
+        <field name="name">sl.stock.export.wizard.form</field>
+        <field name="model">sl.stock.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export Stock to Excel">
+                <group>
+                    <field name="mode" widget="radio"/>
+                </group>
+                <group>
+                    <group string="Scope">
+                        <field name="warehouse_ids" widget="many2many_tags"
+                               placeholder="All warehouses"/>
+                        <field name="location_ids" widget="many2many_tags"
+                               placeholder="All internal locations"/>
+                    </group>
+                    <group string="Products">
+                        <field name="category_ids" widget="many2many_tags"
+                               placeholder="All categories"/>
+                        <field name="product_ids" widget="many2many_tags"
+                               placeholder="All storable products"/>
+                    </group>
+                </group>
+                <group string="Options">
+                    <field name="include_zero"/>
+                    <field name="include_lots" invisible="mode != 'location'"/>
+                    <field name="include_valuation"/>
+                </group>
+                <footer>
+                    <button name="action_export" type="object" string="Export"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sl_stock_export_wizard" model="ir.actions.act_window">
+        <field name="name">Export Stock to Excel</field>
+        <field name="res_model">sl.stock.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sl_stock_export"
+              name="Export Stock to Excel"
+              parent="stock.menu_warehouse_report"
+              action="action_sl_stock_export_wizard"
+              sequence="90"/>
+
+</odoo>
