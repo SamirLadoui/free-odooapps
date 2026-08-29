@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_mass_editing_wizard_form" model="ir.ui.view">
+        <field name="name">sl.mass.editing.wizard.form</field>
+        <field name="model">sl.mass.editing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Edit">
+                <field name="mass_edit_id" invisible="1"/><!-- carries the field whitelist through to the lines -->
+                <field name="model_name" invisible="1"/><!-- names the model in the confirmation text -->
+                <div class="alert alert-warning" role="alert">
+                    This will change <field name="record_count" class="oe_inline"/>
+                    selected record(s). There is no undo.
+                </div>
+                <field name="line_ids">
+                    <list editable="bottom">
+                        <field name="allowed_field_ids" column_invisible="1"/><!-- the whitelist the field selector is limited to -->
+                        <field name="field_id" options="{'no_create': True}"
+                               domain="[('id', 'in', allowed_field_ids)]"/>
+                        <field name="field_type" column_invisible="1"/><!-- drives which value column applies -->
+                        <field name="field_relation" column_invisible="1"/><!-- validates the chosen record's model -->
+                        <field name="operation"/>
+                        <field name="value_reference"
+                               invisible="operation == 'clear' or field_type not in ('many2one', 'many2many')"
+                               required="operation != 'clear' and field_type in ('many2one', 'many2many')"/>
+                        <field name="value_char"
+                               invisible="operation == 'clear' or field_type not in ('char',)"/>
+                        <field name="value_text"
+                               invisible="operation == 'clear' or field_type not in ('text', 'html')"/>
+                        <field name="value_integer"
+                               invisible="operation == 'clear' or field_type != 'integer'"/>
+                        <field name="value_float"
+                               invisible="operation == 'clear' or field_type not in ('float', 'monetary')"/>
+                        <field name="value_boolean"
+                               invisible="operation == 'clear' or field_type != 'boolean'"/>
+                        <field name="value_date"
+                               invisible="operation == 'clear' or field_type != 'date'"/>
+                        <field name="value_datetime"
+                               invisible="operation == 'clear' or field_type != 'datetime'"/>
+                        <field name="value_selection"
+                               invisible="operation == 'clear' or field_type != 'selection'"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Apply"
+                            class="btn-primary"
+                            confirm="Apply these changes to every selected record?"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
