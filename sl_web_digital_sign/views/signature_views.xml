@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_signature_list" model="ir.ui.view">
+        <field name="name">sl.signature.list</field>
+        <field name="model">sl.signature</field>
+        <field name="arch" type="xml">
+            <list string="Signatures" create="false">
+                <field name="signed_on"/>
+                <field name="signer_name"/>
+                <field name="signer_email" optional="show"/>
+                <field name="res_model" string="Model"/>
+                <field name="record_name" string="Record"/>
+                <field name="note" optional="hide"/>
+                <field name="captured_by_id" optional="show"/>
+                <field name="signed_ip" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_signature_form" model="ir.ui.view">
+        <field name="name">sl.signature.form</field>
+        <field name="model">sl.signature</field>
+        <field name="arch" type="xml">
+            <form string="Signature" create="false" edit="false">
+                <header>
+                    <button name="action_open_record" type="object"
+                            string="Open Signed Record" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="signer_name"/>
+                        <h1><field name="signer_name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Signed">
+                            <field name="signed_on"/>
+                            <field name="signer_email" widget="email"/>
+                            <field name="note"/>
+                        </group>
+                        <group string="Record">
+                            <field name="res_model" string="Model"/>
+                            <field name="record_name" string="Record"/>
+                            <field name="captured_by_id"/>
+                            <field name="signed_ip"/>
+                        </group>
+                    </group>
+                    <group string="Signature">
+                        <field name="signature" widget="image" nolabel="1"
+                               options="{'size': [400, 200]}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_signature_search" model="ir.ui.view">
+        <field name="name">sl.signature.search</field>
+        <field name="model">sl.signature</field>
+        <field name="arch" type="xml">
+            <search string="Signatures">
+                <field name="signer_name"/>
+                <field name="record_name"/>
+                <field name="res_model" string="Model"/>
+                <field name="captured_by_id"/>
+                <filter name="filter_today" string="Today"
+                        domain="[('signed_on', '&gt;=', 'today')]"/>
+                <group>
+                    <filter name="group_model" string="Model"
+                            context="{'group_by': 'res_model'}"/>
+                    <filter name="group_signer" string="Signed By"
+                            context="{'group_by': 'signer_name'}"/>
+                    <filter name="group_date" string="Signed On"
+                            context="{'group_by': 'signed_on:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_signature" model="ir.actions.act_window">
+        <field name="name">Signatures</field>
+        <field name="res_model">sl.signature</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No signatures captured yet</p>
+            <p>
+                Make a model signable under Configuration, then use the
+                <b>Sign this record</b> entry in its Action menu.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_signature_config_list" model="ir.ui.view">
+        <field name="name">sl.signature.config.list</field>
+        <field name="model">sl.signature.config</field>
+        <field name="arch" type="xml">
+            <list string="Signable Models" editable="bottom">
+                <field name="model_id" options="{'no_create': True}"/>
+                <field name="label"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_signature_config_form" model="ir.ui.view">
+        <field name="name">sl.signature.config.form</field>
+        <field name="model">sl.signature.config</field>
+        <field name="arch" type="xml">
+            <form string="Signable Model">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <group>
+                        <group>
+                            <field name="model_id" options="{'no_create': True}"/>
+                            <field name="label"/>
+                        </group>
+                        <group>
+                            <field name="note" placeholder="Delivery accepted"/>
+                            <field name="action_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="status">
+                        Once saved, <b>Sign this record</b> appears in this model's
+                        Action menu. Signing stores the signature, who signed, when,
+                        and from which address, attaches a copy to the record, and
+                        notes it in the record's chatter.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_signature_config" model="ir.actions.act_window">
+        <field name="name">Signable Models</field>
+        <field name="res_model">sl.signature.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_signature_root" name="Signatures"
+              parent="base.menu_administration" sequence="65"
+              groups="base.group_user"/>
+    <menuitem id="menu_signature" name="Captured Signatures"
+              parent="menu_signature_root" action="action_signature" sequence="10"/>
+    <menuitem id="menu_signature_config" name="Signable Models"
+              parent="menu_signature_root" action="action_signature_config"
+              sequence="20" groups="base.group_system"/>
+
+</odoo>

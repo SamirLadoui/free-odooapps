@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_signature_wizard_form" model="ir.ui.view">
+        <field name="name">sl.signature.wizard.form</field>
+        <field name="model">sl.signature.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sign">
+                <field name="config_id" invisible="1"/><!-- names the target model for action_sign -->
+                <field name="model_name" invisible="1"/><!-- shown in the confirmation text below -->
+                <div class="alert alert-info" role="status">
+                    Signing <field name="record_count" class="oe_inline"/> record(s).
+                </div>
+                <group>
+                    <group>
+                        <field name="signer_name"/>
+                        <field name="signer_email" widget="email"/>
+                    </group>
+                    <group>
+                        <field name="note" placeholder="Delivery accepted"/>
+                    </group>
+                </group>
+                <group string="Signature">
+                    <field name="signature" widget="signature" nolabel="1"
+                           options="{'full_name': 'signer_name'}"/>
+                </group>
+                <footer>
+                    <button name="action_sign" type="object" string="Sign"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
