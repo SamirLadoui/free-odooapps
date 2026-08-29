@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 15.0 / 16.0 build the settings page out of o_setting_box divs.
+     17.0 replaced that with <block>/<setting>, so this file is a genuine
+     structural fork rather than a mechanical port. -->
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sl.web.login</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='companies']" position="after">
+                <div id="sl_web_login">
+                    <h2>Login Screen</h2>
+                    <div class="row mt16 o_settings_container" name="sl_web_login_container">
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_login_background_setting">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Background</span>
+                                <div class="text-muted">Shown full-bleed behind the login card.</div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="login_background_color" class="col-lg-5 o_light_label"/>
+                                        <field name="login_background_color" placeholder="#f1f3f5"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label for="login_background_blur" class="col-lg-5 o_light_label"/>
+                                        <field name="login_background_blur"/>
+                                    </div>
+                                    <div class="mt16">
+                                        <field name="login_background" widget="image"
+                                               options="{'size': [180, 100]}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_login_logo_setting">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Logo</span>
+                                <div class="text-muted">Replaces the company logo on the login screen only.</div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="login_logo_height" class="col-lg-5 o_light_label"/>
+                                        <field name="login_logo_height"/>
+                                    </div>
+                                    <div class="mt16">
+                                        <field name="login_logo" widget="image"
+                                               options="{'size': [180, 100]}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_login_card_setting">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Card and Buttons</span>
+                                <div class="text-muted">Size of the login card and the colour of its main button.</div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="login_card_width" class="col-lg-5 o_light_label"/>
+                                        <field name="login_card_width"/>
+                                    </div>
+                                    <div class="row mt16">
+                                        <label for="login_button_color" class="col-lg-5 o_light_label"/>
+                                        <field name="login_button_color" placeholder="#714B67"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_login_footer_setting">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Footer</span>
+                                <div class="text-muted">What appears under the login form.</div>
+                                <div class="content-group">
+                                    <div class="row mt16">
+                                        <label for="login_footer_text" class="col-lg-5 o_light_label"/>
+                                        <field name="login_footer_text"
+                                               placeholder="Need help? support@example.com"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_login_hide_db_setting">
+                            <div class="o_setting_left_pane">
+                                <field name="login_hide_db_manager"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="login_hide_db_manager"/>
+                                <div class="text-muted">
+                                    Removes the link from the login footer. This hides the link,
+                                    it does not block the route.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="sl_login_hide_footer_setting">
+                            <div class="o_setting_left_pane">
+                                <field name="login_hide_powered_by"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="login_hide_powered_by"/>
+                                <div class="text-muted">
+                                    Removes the login footer entirely, including the Odoo credit.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
