@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_account_standard_document">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                <h2 t-out="wizard._report_title()"/>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong>Company:</strong> <span t-out="wizard.company_id.name"/><br/>
+                        <strong>Period:</strong>
+                        <span t-out="wizard.date_from"/> &#8594; <span t-out="wizard.date_to"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Entries:</strong>
+                        <span t-out="dict(wizard._fields['target_move'].selection)[wizard.target_move]"/><br/>
+                        <strong>Accounts shown:</strong>
+                        <span t-out="dict(wizard._fields['display_account'].selection)[wizard.display_account]"/>
+                    </div>
+                </div>
+
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Account</th>
+                            <th t-if="wizard.report_type == 'partner_ledger'">Partner</th>
+                            <th class="text-end">Opening</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                            <th class="text-end">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="rows" t-as="row">
+                            <tr>
+                                <td><span t-out="row['account_code']"/></td>
+                                <td><span t-out="row['account_name']"/></td>
+                                <td t-if="wizard.report_type == 'partner_ledger'">
+                                    <span t-out="row['partner_name']"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="row['opening']"
+                                          t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="row['debit']"
+                                          t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="row['credit']"
+                                          t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-out="row['balance']"
+                                          t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                                </td>
+                            </tr>
+                            <t t-if="row['lines']">
+                                <tr t-foreach="row['lines']" t-as="line" class="text-muted">
+                                    <td/>
+                                    <td colspan="2" style="padding-left: 1.5rem;">
+                                        <small>
+                                            <span t-out="line['date']"/> &#183;
+                                            <span t-out="line['move']"/> &#183;
+                                            <span t-out="line['journal']"/>
+                                            <t t-if="line['label']"> &#183; <span t-out="line['label']"/></t>
+                                            <t t-if="line['reconciled']"> &#183; reconciled</t>
+                                        </small>
+                                    </td>
+                                    <td class="text-end">
+                                        <small><span t-out="line['debit']"
+                                              t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/></small>
+                                    </td>
+                                    <td class="text-end">
+                                        <small><span t-out="line['credit']"
+                                              t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/></small>
+                                    </td>
+                                    <td/>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                    <tfoot>
+                        <tr style="border-top: 2px solid #000;">
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td t-if="wizard.report_type == 'partner_ledger'"/>
+                            <td class="text-end"><strong>
+                                <span t-out="totals['opening']"
+                                      t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                            </strong></td>
+                            <td class="text-end"><strong>
+                                <span t-out="totals['debit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                            </strong></td>
+                            <td class="text-end"><strong>
+                                <span t-out="totals['credit']"
+                                      t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                            </strong></td>
+                            <td class="text-end"><strong>
+                                <span t-out="totals['balance']"
+                                      t-options="{'widget': 'monetary', 'display_currency': wizard.company_id.currency_id}"/>
+                            </strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_account_standard">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wizard">
+                <t t-set="rows" t-value="wizard._collect()"/>
+                <t t-set="totals" t-value="wizard._totals(rows)"/>
+                <t t-call="sl_account_standard_report.report_account_standard_document"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_account_standard" model="ir.actions.report">
+        <field name="name">Standard Accounting Report</field>
+        <field name="model">sl.account.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sl_account_standard_report.report_account_standard</field>
+        <field name="report_file">sl_account_standard_report.report_account_standard</field>
+        <field name="print_report_name">object._report_title()</field>
+    </record>
+
+</odoo>
