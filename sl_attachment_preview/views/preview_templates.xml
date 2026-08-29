@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="preview_page" name="Attachment Preview">
+        <t t-call="web.frontend_layout">
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+            <t t-set="title" t-value="attachment.name"/>
+
+            <div class="sl_preview">
+                <div class="sl_preview_bar">
+                    <div class="sl_preview_meta">
+                        <span class="sl_preview_name" t-out="attachment.name"/>
+                        <span class="sl_preview_sub">
+                            <t t-out="attachment.mimetype or 'unknown type'"/>
+                            <t t-if="attachment.file_size">
+                                &#183; <t t-out="attachment.file_size"/> bytes
+                            </t>
+                        </span>
+                    </div>
+                    <div class="sl_preview_actions">
+                        <a t-if="previous" t-attf-href="/sl_attachment_preview/#{previous.id}"
+                           class="btn btn-secondary btn-sm" title="Previous attachment">&#8592;</a>
+                        <a t-if="next" t-attf-href="/sl_attachment_preview/#{next.id}"
+                           class="btn btn-secondary btn-sm" title="Next attachment">&#8594;</a>
+                        <a t-attf-href="/web/content/#{attachment.id}?download=true"
+                           class="btn btn-primary btn-sm">Download</a>
+                    </div>
+                </div>
+
+                <div class="sl_preview_body">
+                    <img t-if="kind == 'image'" class="sl_preview_image"
+                         t-attf-src="/web/content/#{attachment.id}" t-att-alt="attachment.name"/>
+
+                    <iframe t-if="kind == 'pdf'" class="sl_preview_frame"
+                            t-attf-src="/web/content/#{attachment.id}#view=FitH"
+                            t-att-title="attachment.name"/>
+
+                    <pre t-if="kind == 'text'" class="sl_preview_text" t-out="text"/>
+
+                    <video t-if="kind == 'video'" class="sl_preview_media" controls="controls">
+                        <source t-attf-src="/web/content/#{attachment.id}"
+                                t-att-type="attachment.mimetype"/>
+                    </video>
+
+                    <audio t-if="kind == 'audio'" class="sl_preview_media" controls="controls">
+                        <source t-attf-src="/web/content/#{attachment.id}"
+                                t-att-type="attachment.mimetype"/>
+                    </audio>
+
+                    <div t-if="kind == 'none'" class="sl_preview_empty">
+                        <h4>No preview for this file type</h4>
+                        <p class="text-muted">
+                            <t t-out="attachment.mimetype or 'This file'"/> cannot be shown in
+                            the browser. Download it to open it locally.
+                        </p>
+                        <a t-attf-href="/web/content/#{attachment.id}?download=true"
+                           class="btn btn-primary">Download <t t-out="attachment.name"/></a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
