@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sl.google.maps</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='companies_setting_container']" position="after">
+                <block title="Google Maps" name="sl_google_maps_container">
+                    <setting id="sl_google_maps_key_setting" string="API Key"
+                             help="Optional. Without a key, map buttons open google.com/maps in a new tab. With one, maps are embedded directly in Odoo.">
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label for="google_maps_api_key" class="col-lg-4 o_light_label"/>
+                                <field name="google_maps_api_key" password="True"
+                                       placeholder="AIza..."/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="google_maps_zoom" class="col-lg-4 o_light_label"/>
+                                <field name="google_maps_zoom"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

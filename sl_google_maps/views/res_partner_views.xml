@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_map" model="ir.ui.view">
+        <field name="name">res.partner.form.map</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Places autocomplete on the street field: typing offers Google's
+                 suggestions and picking one fills the rest of the address. -->
+            <field name="street" position="attributes">
+                <attribute name="widget">sl_places_autocomplete</attribute>
+            </field>
+            <div name="button_box" position="inside">
+                <button name="action_show_on_map" type="object"
+                        class="oe_stat_button" icon="fa-map-marker"
+                        invisible="not has_mappable_address">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Show on</span>
+                        <span class="o_stat_text">Map</span>
+                    </div>
+                </button>
+                <field name="has_mappable_address" invisible="1"/><!-- hides the map button when there is no address -->
+            </div>
+        </field>
+    </record>
+
+    <record id="action_partner_show_on_map" model="ir.actions.server">
+        <field name="name">Show on Map</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_show_selection_on_map()</field>
+    </record>
+
+</odoo>
