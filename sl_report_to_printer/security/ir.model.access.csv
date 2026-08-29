@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_printing_server_admin,sl.printing.server.admin,model_sl_printing_server,base.group_system,1,1,1,1
+access_printing_server_user,sl.printing.server.user,model_sl_printing_server,base.group_user,1,0,0,0
+access_printer_admin,sl.printer.admin,model_sl_printer,base.group_system,1,1,1,1
+access_printer_user,sl.printer.user,model_sl_printer,base.group_user,1,0,0,0
