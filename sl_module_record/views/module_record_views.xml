@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_module_record_list" model="ir.ui.view">
+        <field name="name">sl.module.record.list</field>
+        <field name="model">sl.module.record</field>
+        <field name="arch" type="xml">
+            <list string="Configuration Recordings">
+                <field name="name"/>
+                <field name="technical_name"/>
+                <field name="date_start"/>
+                <field name="date_stop"/>
+                <field name="line_count" string="Captured"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'recording'"
+                       decoration-success="state == 'stopped'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_module_record_form" model="ir.ui.view">
+        <field name="name">sl.module.record.form</field>
+        <field name="model">sl.module.record</field>
+        <field name="arch" type="xml">
+            <form string="Configuration Recording">
+                <header>
+                    <button name="action_start" type="object" string="Start Recording"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_stop" type="object" string="Stop Recording"
+                            class="btn-primary" invisible="state != 'recording'"/>
+                    <button name="action_export" type="object" string="Download Module"
+                            class="btn-primary" invisible="state != 'stopped'"/>
+                    <button name="action_reset" type="object" string="Start Over"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,recording,stopped"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Payment terms and journals"/></h1>
+                    </div>
+                    <group>
+                        <group string="Generated Module">
+                            <field name="technical_name"/>
+                            <field name="module_version"/>
+                            <field name="module_license"/>
+                        </group>
+                        <group string="Credits">
+                            <field name="summary"/>
+                            <field name="author"/>
+                            <field name="website"/>
+                        </group>
+                    </group>
+                    <group string="Models To Watch">
+                        <field name="model_ids" widget="many2many_tags" nolabel="1"
+                               options="{'no_create': True}"
+                               readonly="state != 'draft'"/>
+                    </group>
+                    <div class="alert alert-info" role="status" invisible="state != 'draft'">
+                        Pick the models you are about to change, press
+                        <b>Start Recording</b>, make your configuration changes anywhere
+                        in Odoo, then come back and press <b>Stop Recording</b>.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="state != 'recording'">
+                        Recording since <field name="date_start" readonly="1" class="oe_inline"/>.
+                        Go and make your changes, then come back and stop.
+                    </div>
+                    <notebook invisible="state == 'draft'">
+                        <page string="Captured Changes" name="captured">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="included" readonly="0"/>
+                                    <field name="model_name" string="Model"/>
+                                    <field name="res_id"/>
+                                    <field name="res_name"/>
+                                    <field name="operation" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_module_record" model="ir.actions.act_window">
+        <field name="name">Configuration Recordings</field>
+        <field name="res_model">sl.module.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Capture your configuration as a module</p>
+            <p>
+                Record the changes you make in the interface, then download them as an
+                installable module you can put in version control or deploy elsewhere.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_module_record" name="Configuration Recorder"
+              parent="base.menu_custom" action="action_module_record"
+              sequence="60" groups="base.group_system"/>
+
+</odoo>
