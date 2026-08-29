@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_appointment_list" model="ir.ui.view">
+        <field name="name">sl.hospital.appointment.list</field>
+        <field name="model">sl.hospital.appointment</field>
+        <field name="arch" type="xml">
+            <tree string="Appointments" decoration-muted="state == 'cancelled'"
+                  decoration-success="state == 'done'">
+                <field name="code"/>
+                <field name="appointment_date"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="duration" optional="hide"/>
+                <field name="consultation_fee" optional="hide" widget="monetary"/>
+                <field name="currency_id" column_invisible="1"/><!-- drives the monetary widget on the fee -->
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-info="state == 'confirmed'"
+                       decoration-warning="state == 'in_consultation'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_appointment_calendar" model="ir.ui.view">
+        <field name="name">sl.hospital.appointment.calendar</field>
+        <field name="model">sl.hospital.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointments" date_start="appointment_date"
+                      date_stop="end_date" color="doctor_id" mode="week">
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_appointment_form" model="ir.ui.view">
+        <field name="name">sl.hospital.appointment.form</field>
+        <field name="model">sl.hospital.appointment</field>
+        <field name="arch" type="xml">
+            <form string="Appointment">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_start" type="object" string="Start Consultation"
+                            class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_done" type="object" string="Close"
+                            class="btn-primary" invisible="state != 'in_consultation'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('cancelled',)"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_consultation,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="code" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Who">
+                            <field name="patient_id"/>
+                            <field name="doctor_id"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group string="When">
+                            <field name="appointment_date"/>
+                            <field name="duration" widget="float_time"/>
+                            <field name="end_date" readonly="1"/>
+                            <field name="consultation_fee" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/><!-- currency for the monetary widget above -->
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not patient_allergies">
+                        <strong>Allergies:</strong>
+                        <field name="patient_allergies" readonly="1" nolabel="1"
+                               class="oe_inline"/>
+                    </div>
+                    <notebook>
+                        <page string="Consultation" name="consultation">
+                            <group>
+                                <field name="reason" placeholder="What brought the patient in"/>
+                                <field name="diagnosis"
+                                       placeholder="Required before the appointment can be closed"/>
+                            </group>
+                        </page>
+                        <page string="Prescription" name="prescription">
+                            <field name="prescription_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="medicine"/>
+                                    <field name="dosage"/>
+                                    <field name="duration_days"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_appointment_search" model="ir.ui.view">
+        <field name="name">sl.hospital.appointment.search</field>
+        <field name="model">sl.hospital.appointment</field>
+        <field name="arch" type="xml">
+            <search string="Appointments">
+                <field name="code"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="department_id"/>
+                <filter name="filter_today" string="Today"
+                        domain="[('appointment_date', '&gt;=', 'today'),
+                                 ('appointment_date', '&lt;', 'today +1d')]"/>
+                <filter name="filter_upcoming" string="Upcoming"
+                        domain="[('appointment_date', '&gt;=', 'today'),
+                                 ('state', 'in', ['draft', 'confirmed'])]"/>
+                <separator/>
+                <filter name="filter_confirmed" string="Confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_done" string="Done"
+                        domain="[('state', '=', 'done')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_doctor" string="Doctor"
+                            context="{'group_by': 'doctor_id'}"/>
+                    <filter name="group_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_date" string="Date"
+                            context="{'group_by': 'appointment_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_appointment" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="res_model">sl.hospital.appointment</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Book your first appointment</p>
+            <p>
+                Confirmed appointments hold the doctor's time: a second booking that
+                overlaps is refused rather than quietly double-booked.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_hospital_root" name="Hospital"
+              web_icon="sl_hospital,static/description/icon.png"
+              sequence="91" groups="group_hospital_user"/>
+    <menuitem id="menu_hospital_appointments" name="Appointments"
+              parent="menu_hospital_root" action="action_appointment" sequence="10"/>
+    <menuitem id="menu_hospital_patients" name="Patients"
+              parent="menu_hospital_root" action="action_patient" sequence="20"/>
+    <menuitem id="menu_hospital_configuration" name="Configuration"
+              parent="menu_hospital_root" sequence="90" groups="group_hospital_manager"/>
+    <menuitem id="menu_hospital_doctors" name="Doctors"
+              parent="menu_hospital_configuration" action="action_doctor" sequence="10"/>
+    <menuitem id="menu_hospital_departments" name="Departments"
+              parent="menu_hospital_configuration" action="action_department" sequence="20"/>
+
+</odoo>
