@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_db_backup" model="ir.cron">
+        <field name="name">Automated Backup</field>
+        <field name="model_id" ref="model_db_backup"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_backup()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

@@ -1,0 +1,112 @@
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h2 class="oe_slogan">Database Auto-Backup</h2>
+            <h3 class="oe_slogan">Scheduled Database Dumps to Local Disk or a Remote SFTP Server</h3>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <p class="oe_mt32">Set up unattended backups of any database on your Odoo server, keep the backup directory from filling up, and get an email the moment a scheduled run fails. No shell access or cron editing required.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Key Features</h3>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Any Database On The Server</h4>
+            <p class="oe_mt8 text-center">Back up the current database or any other one hosted on the same server. Create as many scheduled backups as you need, each with its own destination and retention.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Two Formats</h4>
+            <p class="oe_mt8 text-center">Choose a zip archive containing the database and its filestore, or a plain pg_dump when you only need the SQL and want the smaller file.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Local Or Remote SFTP</h4>
+            <p class="oe_mt8 text-center">Write to a directory on the server, or push the dump straight to a remote SFTP host so your backups do not live on the same machine as the database.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Automatic Retention</h4>
+            <p class="oe_mt8 text-center">Delete dumps older than the number of days you choose. Retention only ever removes this database&#x27;s own dumps, so unrelated files in the same folder are never touched.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Alerts On Failure</h4>
+            <p class="oe_mt8 text-center">Give each backup a notification address and Odoo emails you the error the moment a scheduled run fails, instead of finding out when you need the backup.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Test Before You Trust It</h4>
+            <p class="oe_mt8 text-center">A Test Connection button checks the directory is writable, or that the SFTP credentials work, so a misconfigured destination is caught before the first nightly run rather than after it.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Getting Started</h3>
+        <div class="oe_span12">
+            <ol style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Install the module and open Settings &gt; Backups &gt; Scheduled Backups.</li>
+                <li class="oe_mt8">Create a record, pick the database, the format and the destination.</li>
+                <li class="oe_mt8">Press Test Connection, then Back Up Now, to confirm the setup works.</li>
+                <li class="oe_mt8">Enable the Automated Backup scheduled action under Settings &gt; Technical &gt; Scheduled Actions and set how often it should run. It ships disabled so nothing runs until you say so.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Good To Know</h3>
+        <div class="oe_span12">
+            <ul style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Backups are written to a temporary file first and moved into place only once complete, so an interrupted run never leaves a truncated file that looks like a valid backup.</li>
+                <li class="oe_mt8">One misconfigured backup does not stop the others in the same scheduled run.</li>
+                <li class="oe_mt8">The SFTP destination needs the paramiko Python package on the Odoo server: pip install paramiko</li>
+                <li class="oe_mt8">Only users in the Settings group can see or edit backup configurations.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <h3>Supported Odoo Versions</h3>
+            <p class="oe_mt16"><strong>17.0 &middot; 18.0 &middot; 19.0</strong></p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Contact Us</h3>
+        <div class="oe_span12 text-center">
+            <p class="oe_mt16">
+                If you have any queries or need support for this module, feel free to contact us.
+            </p>
+            <p class="oe_mt16">
+                <a href="https://www.linkedin.com/in/samir-ladoui" target="_blank" class="oe_social_media">
+                    <i class="fa fa-linkedin-square fa-2x"></i> LinkedIn: samir-ladoui
+                </a>
+                <a href="https://wa.me/+213658127254" target="_blank" class="oe_social_media"
+                    style="margin-left: 20px;">
+                    <i class="fa fa-whatsapp fa-2x"></i> WhatsApp: +213658127254
+                </a>
+            </p>
+            <p class="oe_mt8">
+                Email: <a href="mailto:samir.odoo.apps2325@gmail.com">samir.odoo.apps2325@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>
