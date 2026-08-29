@@ -1,0 +1,111 @@
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h2 class="oe_slogan">Currency Rate Update</h2>
+            <h3 class="oe_slogan">Daily Exchange Rates From The European Central Bank, Automatically</h3>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <p class="oe_mt32">Keeps your currency rates current from a free public feed, on a schedule. No account, no API key, no subscription, and correct whatever currency your company trades in.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Key Features</h3>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Free, Official Data</h4>
+            <p class="oe_mt8 text-center">Rates come from the European Central Bank&#x27;s daily reference feed, either directly or through the Frankfurter JSON mirror of the same data. Neither needs registration.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Right For Any Company Currency</h4>
+            <p class="oe_mt8 text-center">The ECB quotes everything against the euro, but Odoo stores rates against your company currency. This module rebases the feed before writing, so a dollar or pound company gets correct figures, not euro ones.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Only The Currencies You Use</h4>
+            <p class="oe_mt8 text-center">List the currencies you actually deal in. Nothing else in your database is touched, and your company currency is refused outright since its rate is always one.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Safe To Run Twice</h4>
+            <p class="oe_mt8 text-center">Running again on the same day updates that day&#x27;s rate rather than adding a second one, so a manual refresh never leaves duplicate entries behind.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Honest About Gaps</h4>
+            <p class="oe_mt8 text-center">A currency the feed does not quote is skipped and named in the run&#x27;s result message, rather than silently written as zero or blowing up the whole update.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">One Failure Does Not Stop The Rest</h4>
+            <p class="oe_mt8 text-center">In a scheduled run, an unreachable provider is logged and the others still complete. Every provider records the outcome and message of its last run.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Getting Started</h3>
+        <div class="oe_span12">
+            <ol style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Install the module and open Settings &gt; Currency Rates &gt; Rate Providers.</li>
+                <li class="oe_mt8">Create a provider, choose the source, and list the currencies you deal in.</li>
+                <li class="oe_mt8">Press Update Now and check the result message.</li>
+                <li class="oe_mt8">Enable the Update Currency Rates scheduled action under Settings &gt; Technical &gt; Scheduled Actions. It ships disabled so nothing runs until you say so.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Good To Know</h3>
+        <div class="oe_span12">
+            <ul style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">The ECB publishes on business days only, so a weekend run simply repeats Friday&#x27;s rates.</li>
+                <li class="oe_mt8">One provider per company: on a multi-company database, create one for each.</li>
+                <li class="oe_mt8">Rates are written against the company currency of the provider&#x27;s company, which is what Odoo&#x27;s own conversion expects.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <h3>Supported Odoo Versions</h3>
+            <p class="oe_mt16"><strong>18.0 &middot; 19.0</strong></p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Contact Us</h3>
+        <div class="oe_span12 text-center">
+            <p class="oe_mt16">
+                If you have any queries or need support for this module, feel free to contact us.
+            </p>
+            <p class="oe_mt16">
+                <a href="https://www.linkedin.com/in/samir-ladoui" target="_blank" class="oe_social_media">
+                    <i class="fa fa-linkedin-square fa-2x"></i> LinkedIn: samir-ladoui
+                </a>
+                <a href="https://wa.me/+213658127254" target="_blank" class="oe_social_media"
+                    style="margin-left: 20px;">
+                    <i class="fa fa-whatsapp fa-2x"></i> WhatsApp: +213658127254
+                </a>
+            </p>
+            <p class="oe_mt8">
+                Email: <a href="mailto:samir.odoo.apps2325@gmail.com">samir.odoo.apps2325@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>
