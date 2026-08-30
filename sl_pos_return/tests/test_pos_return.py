@@ -17,8 +17,49 @@ class TestPosReturn(TransactionCase):
             'name': 'Other Thing', 'available_in_pos': True,
             'list_price': 10.0, 'taxes_id': False})
         cls.partner = cls.env['res.partner'].create({'name': 'Return Customer'})
+        # pos.config.create installs modules and warns that the environment
+        # is no longer valid afterwards, so 16.0 reads sequence_id as False
+        # unless the cache is dropped first.
+        if hasattr(cls.env, 'invalidate_all'):
+            cls.env.invalidate_all()
+        else:
+            cls.env.cache.invalidate()
+        cls._give_it_a_payment_method(cls.config)
+        cls._give_it_a_sequence(cls.config)
         cls.config.open_ui()
         cls.session = cls.config.current_session_id
+
+    @classmethod
+    def _give_it_a_sequence(cls, config):
+        """pos.order takes its name from the config sequence, and a config
+        built in a test does not always end up with one."""
+        sequence = cls.env['ir.sequence'].sudo()
+        if 'sequence_id' not in config._fields:
+            return  # 19.0 dropped it; the order name comes from elsewhere
+        if not config.sequence_id:
+            config.sudo().sequence_id = sequence.create({
+                'name': 'Test POS Order', 'padding': 4, 'prefix': 'TSTPOS/',
+                'code': 'pos.order', 'implementation': 'standard'}).id
+        if 'sequence_line_id' in config._fields and not config.sequence_line_id:
+            config.sudo().sequence_line_id = sequence.create({
+                'name': 'Test POS Line', 'padding': 4, 'prefix': 'TSTPOSL/',
+                'code': 'pos.order.line', 'implementation': 'standard'}).id
+
+    @classmethod
+    def _give_it_a_payment_method(cls, config):
+        """A session refuses to open without one, and a config created in a
+        test does not inherit the demo methods on every version."""
+        if config.payment_method_ids:
+            return
+        method = cls.env['pos.payment.method'].search(
+            [('company_id', '=', cls.env.company.id)], limit=1)
+        if not method:
+            journal = cls.env['account.journal'].search(
+                [('type', 'in', ('cash', 'bank')),
+                 ('company_id', '=', cls.env.company.id)], limit=1)
+            method = cls.env['pos.payment.method'].create({
+                'name': 'Test Cash', 'journal_id': journal.id})
+        config.payment_method_ids = [(6, 0, method.ids)]
 
     def _order(self, lines, reference='Order 0001-0001-0001', **values):
         """A paid order, written the way the point of sale writes one."""
@@ -30,7 +71,7 @@ class TestPosReturn(TransactionCase):
             'price_subtotal_incl': product.list_price * qty,
         }) for product, qty in lines]
         total = sum(p.list_price * q for p, q in lines)
-        return self.env['pos.order'].create(dict({
+        values = dict({
             'session_id': self.session.id,
             # A real order gets a name from the session sequence; without one
             # every fixture would sit at '/' and match every other lookup.
@@ -43,7 +84,15 @@ class TestPosReturn(TransactionCase):
             'amount_return': 0.0,
             'lines': order_lines,
             'state': 'paid',
-        }, **values))
+        }, **values)
+        # Create in draft and move to paid afterwards, the way the till does.
+        # 16.0 computes the order name inside create from an empty recordset,
+        # so a state of 'paid' in the create values dereferences a sequence
+        # that is not there.
+        state = values.pop('state')
+        order = self.env['pos.order'].create(values)
+        order.write({'state': state})
+        return order
 
     # -- finding the order -------------------------------------------------
 
