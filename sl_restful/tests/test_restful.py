@@ -6,38 +6,80 @@ from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.tests import HttpCase, tagged
 
+import odoo.release
+
+# Odoo 14 and 15 route any request with Content-Type: application/json to the
+# JSON-RPC dispatcher before it reaches a type='http' route, which answers 400.
+# The body is still JSON either way - the controller parses it itself - so on
+# those versions the header is the only thing that changes.
+JSON_CONTENT_TYPE = ('application/json'
+                     if odoo.release.version_info[0] >= 16 else 'text/plain')
+
 
 @tagged('post_install', '-at_install')
 class TestRestful(HttpCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        groups_field = ('group_ids' if 'group_ids' in cls.env['res.users']._fields
+    def setUp(self):
+        # Instance level rather than setUpClass: 14.0 has no class-level env.
+        super().setUp()
+        groups_field = ('group_ids' if 'group_ids' in self.env['res.users']._fields
                         else 'groups_id')
         # group_partner_manager as well as group_user: a plain internal user
         # cannot create contacts on a bare database, and this fixture is about
         # exercising the API, not Odoo's partner ACL.
-        cls.api_user = cls.env['res.users'].create({
+        self.api_user = self.env['res.users'].create({
             'name': 'API User', 'login': 'sl_restful_api_user',
             groups_field: [(6, 0, [
-                cls.env.ref('base.group_user').id,
-                cls.env.ref('base.group_partner_manager').id,
+                self.env.ref('base.group_user').id,
+                self.env.ref('base.group_partner_manager').id,
             ])],
         })
-        cls.key_record = cls.env['sl.api.key'].create({
-            'name': 'Test Key', 'user_id': cls.api_user.id})
-        cls.raw_key = cls._mint(cls, cls.key_record)
-        cls.partner = cls.env['res.partner'].create({'name': 'Rest Partner'})
+        self.key_record = self.env['sl.api.key'].create({
+            'name': 'Test Key', 'user_id': self.api_user.id})
+        self.raw_key = self._mint(self.key_record)
+        self.partner = self.env['res.partner'].create({'name': 'Rest Partner'})
 
     def _mint(self, key_record):
-        """Generate a key and capture the secret the UI would show once."""
-        key_record.action_generate()
-        return key_record.key_preview
+        """Generate a key and capture the secret the UI would show once.
+
+        key_preview is a non-stored field with no compute, and 14.0 drops the
+        assigned value rather than keeping it in cache, so fall back to the
+        notification the action returns - it carries the same key.
+        """
+        action = key_record.action_generate()
+        if key_record.key_preview:
+            return key_record.key_preview
+        return action['params']['message'].rsplit(': ', 1)[-1]
+
+    def _base_url(self):
+        """HttpCase grew base_url() in 15.0; on 14 it is built by hand."""
+        if hasattr(self, 'base_url'):
+            return self.base_url()
+        import odoo
+        from odoo.tests.common import HOST
+        return 'http://%s:%s' % (HOST, odoo.tools.config['http_port'])
+
+    def _flush(self):
+        """Odoo moved flushing three times: Model.flush() on 14,
+        cr.flush() on 15-16, env.flush_all() on 17+."""
+        if hasattr(self.env, 'flush_all'):
+            self.env.flush_all()
+        elif hasattr(self.env.cr, 'flush'):
+            self.env.cr.flush()
+        else:
+            self.env['base'].flush()
+
+    def _invalidate(self, records, fields):
+        """invalidate_recordset arrived in 17.0; before that it was
+        invalidate_cache on the recordset."""
+        if hasattr(records, 'invalidate_recordset'):
+            records.invalidate_recordset(fields)
+        else:
+            records.invalidate_cache(fields)
 
     def _call(self, method, path, key=None, body=None, headers=None):
-        url = self.base_url() + path
-        head = {'Content-Type': 'application/json'}
+        url = self._base_url() + path
+        head = {'Content-Type': JSON_CONTENT_TYPE}
         if key is not False:
             head['X-Api-Key'] = key or self.raw_key
         head.update(headers or {})
@@ -81,15 +123,15 @@ class TestRestful(HttpCase):
         self.env.cr.execute(
             "UPDATE sl_api_key SET expires_on = %s WHERE id = %s",
             (date.today() - timedelta(days=1), self.key_record.id))
-        self.key_record.invalidate_recordset(['expires_on'])
+        self._invalidate(self.key_record, ['expires_on'])
         self.assertFalse(self.key_record._is_usable())
 
     def test_expired_key_is_rejected_over_http(self):
         self.env.cr.execute(
             "UPDATE sl_api_key SET expires_on = %s WHERE id = %s",
             (date.today() - timedelta(days=1), self.key_record.id))
-        self.key_record.invalidate_recordset(['expires_on'])
-        self.env.cr.flush()
+        self._invalidate(self.key_record, ['expires_on'])
+        self._flush()
         self.assertEqual(self._call('GET', '/api/v1/res.partner').status_code, 401)
 
     def test_expiry_in_the_past_is_refused_on_entry(self):
@@ -126,7 +168,7 @@ class TestRestful(HttpCase):
 
     def test_revoked_key_is_rejected_over_http(self):
         self.key_record.action_revoke()
-        self.env.cr.flush()
+        self._flush()
         self.assertEqual(self._call('GET', '/api/v1/res.partner').status_code, 401)
 
     def test_unknown_model_is_a_404(self):
@@ -135,7 +177,7 @@ class TestRestful(HttpCase):
     def test_restricted_model_is_a_403(self):
         self.key_record.allowed_model_ids = [
             (6, 0, self.env['ir.model']._get('res.partner').ids)]
-        self.env.cr.flush()
+        self._flush()
         self.assertEqual(self._call('GET', '/api/v1/res.country').status_code, 403)
 
     # -- reading -----------------------------------------------------------
@@ -189,10 +231,10 @@ class TestRestful(HttpCase):
         self.assertEqual(response.status_code, 400)
 
     def test_malformed_body_is_a_400(self):
-        url = self.base_url() + '/api/v1/res.partner'
+        url = self._base_url() + '/api/v1/res.partner'
         response = self.opener.request(
             'POST', url, headers={'X-Api-Key': self.raw_key,
-                                  'Content-Type': 'application/json'},
+                                  'Content-Type': JSON_CONTENT_TYPE},
             data='{not json')
         self.assertEqual(response.status_code, 400)
 
@@ -200,7 +242,7 @@ class TestRestful(HttpCase):
         response = self._call('PUT', '/api/v1/res.partner/%d' % self.partner.id,
                               body={'function': 'Buyer'})
         self.assertEqual(response.status_code, 200)
-        self.partner.invalidate_recordset(['function'])
+        self._invalidate(self.partner, ['function'])
         self.assertEqual(self.partner.function, 'Buyer')
 
     def test_update_missing_record_is_a_404(self):
@@ -210,7 +252,7 @@ class TestRestful(HttpCase):
 
     def test_delete_a_record(self):
         victim = self.env['res.partner'].create({'name': 'Doomed By API'})
-        self.env.cr.flush()
+        self._flush()
         response = self._call('DELETE', '/api/v1/res.partner/%d' % victim.id)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(victim.exists())
@@ -235,6 +277,6 @@ class TestRestful(HttpCase):
     def test_use_is_recorded(self):
         before = self.key_record.use_count
         self._call('GET', '/api/v1/res.partner?limit=1')
-        self.key_record.invalidate_recordset(['use_count', 'last_used'])
+        self._invalidate(self.key_record, ['use_count', 'last_used'])
         self.assertGreater(self.key_record.use_count, before)
         self.assertTrue(self.key_record.last_used)
