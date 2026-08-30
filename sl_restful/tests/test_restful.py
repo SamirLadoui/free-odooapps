@@ -78,6 +78,10 @@ class TestRestful(HttpCase):
             records.invalidate_cache(fields)
 
     def _call(self, method, path, key=None, body=None, headers=None):
+        # Going through the session directly (PUT and DELETE need it) bypasses
+        # url_open, which is where Odoo flushes before a request. Without this
+        # the worker reads the database while the fixture is still in cache.
+        self._flush()
         url = self._base_url() + path
         head = {'Content-Type': JSON_CONTENT_TYPE}
         if key is not False:
@@ -231,6 +235,7 @@ class TestRestful(HttpCase):
         self.assertEqual(response.status_code, 400)
 
     def test_malformed_body_is_a_400(self):
+        self._flush()  # this one bypasses _call, so it flushes for itself
         url = self._base_url() + '/api/v1/res.partner'
         response = self.opener.request(
             'POST', url, headers={'X-Api-Key': self.raw_key,
