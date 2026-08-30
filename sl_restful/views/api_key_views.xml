@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_api_key_list" model="ir.ui.view">
+        <field name="name">sl.api.key.list</field>
+        <field name="model">sl.api.key</field>
+        <field name="arch" type="xml">
+            <tree string="API Keys">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="key_prefix" string="Prefix"/>
+                <field name="expires_on" optional="show"/>
+                <field name="last_used"/>
+                <field name="use_count" string="Calls"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_api_key_form" model="ir.ui.view">
+        <field name="name">sl.api.key.form</field>
+        <field name="model">sl.api.key</field>
+        <field name="arch" type="xml">
+            <form string="API Key">
+                <header>
+                    <button name="action_generate" type="object"
+                            string="Generate Key" class="btn-primary"
+                            confirm="Generating replaces any existing key for this record. Anything using the old key will stop working. Continue?"/>
+                    <button name="action_revoke" type="object" string="Revoke"
+                            attrs="{'invisible': [('active', '=', False)]}"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Revoked" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Revoked ribbon -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Warehouse scanner app"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="user_id"/>
+                            <field name="key_prefix" readonly="1"/>
+                            <field name="expires_on"/>
+                        </group>
+                        <group string="Usage">
+                            <field name="last_used" readonly="1"/>
+                            <field name="use_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Restrict To These Models" >
+                        <field name="allowed_model_ids" widget="many2many_tags"
+                               nolabel="1" options="{'no_create': True}"
+                               placeholder="Leave empty for everything this user can already reach"/>
+                    </group>
+                    <div class="alert alert-info" role="status">
+                        Requests using this key run as <b>Acts As</b>, with exactly
+                        that user's access rights. Naming models here narrows the key
+                        further; it can never grant more than the user already has.
+                        The key itself is stored hashed and is shown only once, when
+                        you generate it.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_api_key" model="ir.actions.act_window">
+        <field name="name">REST API Keys</field>
+        <field name="res_model">sl.api.key</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first API key</p>
+            <p>
+                Name it, choose the user it acts as, and press Generate Key.
+                Copy the key straight away: it is stored hashed and cannot be
+                shown again.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_api_key" name="REST API Keys"
+              parent="base.menu_custom" action="action_api_key"
+              sequence="70" groups="base.group_system"/>
+
+</odoo>
