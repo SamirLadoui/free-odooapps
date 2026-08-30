@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_attachment_list_preview" model="ir.ui.view">
+        <field name="name">ir.attachment.list.preview</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="base.view_attachment_tree"/>
+        <field name="arch" type="xml">
+            <field name="type" position="after">
+                <field name="preview_kind" optional="show"/>
+            </field>
+            <list position="inside">
+                <button name="action_preview" type="object" string="Preview"
+                        icon="fa-eye" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_attachment_form_preview" model="ir.ui.view">
+        <field name="name">ir.attachment.form.preview</field>
+        <field name="model">ir.attachment</field>
+        <field name="inherit_id" ref="base.view_attachment_form"/>
+        <field name="arch" type="xml">
+            <sheet position="before">
+                <header>
+                    <button name="action_preview" type="object" string="Preview"
+                            class="btn-primary" icon="fa-eye"/>
+                </header>
+            </sheet>
+            <field name="type" position="after">
+                <field name="preview_kind"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
