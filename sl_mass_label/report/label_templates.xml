@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_label_sheet" model="ir.actions.report">
+        <field name="name">Labels</field>
+        <field name="model">sl.label.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sl_mass_label.report_label_sheet</field>
+        <field name="report_file">sl_mass_label.report_label_sheet</field>
+        <field name="print_report_name">'Labels'</field>
+    </record>
+
+    <template id="report_label_sheet">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="pages" t-value="pages_by_wizard[doc.id]"/>
+                <t t-foreach="pages" t-as="page">
+                    <div class="page">
+                        <table class="sl_label_sheet">
+                            <tbody>
+                                <tr t-foreach="page" t-as="row">
+                                    <td t-foreach="row" t-as="cell"
+                                        t-attf-style="width: #{100.0 / doc.columns}%;"
+                                        class="sl_label_cell">
+                                        <t t-if="cell">
+                                            <div class="sl_label_name"
+                                                 t-esc="cell['name']"/>
+                                            <div t-if="cell['code']"
+                                                 class="sl_label_code"
+                                                 t-esc="cell['code']"/>
+                                            <div t-if="cell['barcode']"
+                                                 class="sl_label_barcode">
+                                                <img t-if="cell['barcode']"
+                                                     t-att-src="'/report/barcode/Code128/%s' % cell['barcode']"
+                                                     alt="Barcode"
+                                                     style="height: 30px;"/>
+                                                <div t-esc="cell['barcode']"/>
+                                            </div>
+                                            <div t-if="cell['price']"
+                                                 class="sl_label_price"
+                                                 t-esc="cell['price']"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

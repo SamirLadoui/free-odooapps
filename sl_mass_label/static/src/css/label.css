@@ -1,0 +1,7 @@
+.sl_label_sheet { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.sl_label_cell { border: 1px dashed #cccccc; padding: 6px; text-align: center;
+                 vertical-align: middle; overflow: hidden; }
+.sl_label_name { font-weight: bold; font-size: 11px; word-wrap: break-word; }
+.sl_label_code { font-size: 10px; color: #555555; }
+.sl_label_barcode { margin-top: 2px; font-size: 9px; }
+.sl_label_price { font-size: 11px; font-weight: bold; margin-top: 2px; }
