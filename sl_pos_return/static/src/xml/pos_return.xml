@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="sl_pos_return.ReturnButton"
+       t-inherit="point_of_sale.ControlButtons" t-inherit-mode="extension">
+        <xpath expr="//SelectPartnerButton" position="before">
+            <button t-if="pos.config.sl_allow_returns"
+                    class="btn btn-light btn-lg lh-lg o-so-tabular-nums"
+                    t-on-click="() => this.slReturn()">
+                <i class="fa fa-undo me-1" role="img" aria-label="Return"
+                   title="Return"/>
+                Return
+            </button>
+        </xpath>
+    </t>
+
+</templates>
