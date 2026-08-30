@@ -1,0 +1,17 @@
+// Form sheets are capped at a fixed width so long documents stay readable on a
+// wide monitor. On a database full of many-column forms that cap wastes half
+// the screen, so it is lifted here.
+.o_form_view .o_form_sheet_bg > .o_form_sheet {
+    max-width: 100% !important;
+}
+
+// The inner grid keeps its own max-width in some views; lift that too.
+.o_form_view .o_form_sheet_bg > .o_form_sheet > .o_inner_group,
+.o_form_view .o_form_sheet_bg > .o_form_sheet > .oe_title {
+    max-width: 100%;
+}
+
+// Settings pages set their own width deliberately; leave them alone.
+.o_form_view.o_res_config_form_view .o_form_sheet_bg > .o_form_sheet {
+    max-width: 1140px !important;
+}
