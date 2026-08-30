@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_sl_pos_return" model="ir.ui.view">
+        <field name="name">res.config.settings.form.sl.pos.return</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pos_interface_section']" position="inside">
+                <setting id="sl_pos_return_setting"
+                         title="Let a cashier give items back against a past receipt."
+                         help="A cashier types the receipt number, picks the lines and the quantities, and the return is recorded against the original order.">
+                    <field name="pos_sl_allow_returns"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pos_order_form_sl_return" model="ir.ui.view">
+        <field name="name">pos.order.form.sl.return</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sl_return_of_order_id" readonly="1"
+                       invisible="not sl_return_of_order_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
