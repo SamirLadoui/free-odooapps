@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_config_view_form_stock_enhancements" model="ir.ui.view">
+        <field name="name">pos.config.form.stock.enhancements</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <!-- other_devices is the one anchor present in the POS config form
+                 from 14.0 through 19.0. -->
+            <xpath expr="//setting[@id='other_devices']" position="after">
+                <setting id="pos_stock_check" string="Enforce Stock Check"
+                         help="Verify availability before a product is added to an order.">
+                    <field name="enforce_pos_stock_check"/>
+                    <div class="content-group" invisible="not enforce_pos_stock_check">
+                        <div class="row mt16">
+                            <label for="available_stock_location_ids"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="available_stock_location_ids"
+                                   widget="many2many_tags"
+                                   options="{'no_create_edit': True}"
+                                   required="enforce_pos_stock_check"/>
+                        </div>
+                        <div class="text-muted">
+                            Only stock in these locations counts. At least one is
+                            required, or every product would read as out of stock.
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
