@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 15.0 / 16.0 build the POS settings page out of o_setting_box divs and have
+     no python-expression attributes; 17.0 replaced both with <setting>. -->
+<odoo>
+    <record id="pos_config_view_form_stock_enhancements" model="ir.ui.view">
+        <field name="name">pos.config.form.stock.enhancements</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='other_devices']" position="after">
+                <div class="col-12 col-lg-6 o_setting_box" id="pos_stock_check">
+                    <div class="o_setting_left_pane">
+                        <field name="enforce_pos_stock_check"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="enforce_pos_stock_check"/>
+                        <div class="text-muted">
+                            Verify availability before a product is added to an order.
+                        </div>
+                        <div class="content-group"
+                             attrs="{'invisible': [('enforce_pos_stock_check', '=', False)]}">
+                            <div class="row mt16">
+                                <label for="available_stock_location_ids"
+                                       class="col-lg-5 o_light_label"/>
+                                <field name="available_stock_location_ids"
+                                       widget="many2many_tags"
+                                       options="{'no_create_edit': True}"
+                                       attrs="{'required': [('enforce_pos_stock_check', '=', True)]}"/>
+                            </div>
+                            <div class="text-muted">
+                                Only stock in these locations counts. At least one is
+                                required, or every product would read as out of stock.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
