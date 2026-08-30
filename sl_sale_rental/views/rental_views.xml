@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_template_form_rental" model="ir.ui.view">
+        <field name="name">product.template.form.rental</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <field name="list_price" position="after">
+                <field name="sl_rentable"/>
+                <field name="sl_rental_units" invisible="not sl_rentable"/>
+                <field name="sl_rental_price_day" invisible="not sl_rentable"/>
+                <field name="sl_rental_price_week" invisible="not sl_rentable"/>
+                <field name="sl_rental_price_month" invisible="not sl_rentable"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_order_form_rental" model="ir.ui.view">
+        <field name="name">sale.order.form.rental</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']"
+                   position="before">
+                <field name="sl_is_rental" optional="show"/>
+                <field name="sl_rental_start" optional="show"/>
+                <field name="sl_rental_return" optional="show"/>
+                <field name="sl_rental_days" optional="hide" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
