@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_employee_form_org_chart" model="ir.ui.view">
+        <field name="name">hr.employee.form.org.chart</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_open_org_chart" type="object"
+                        class="oe_stat_button" icon="fa-sitemap">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Org</span>
+                        <span class="o_stat_text">Chart</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="action_full_org_chart" model="ir.actions.server">
+        <field name="name">Organisation Chart</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">action = env['hr.employee'].action_open_full_org_chart()</field>
+    </record>
+
+    <menuitem id="menu_org_chart" name="Organisation Chart"
+              parent="hr.menu_hr_root" action="action_full_org_chart"
+              sequence="47" groups="hr.group_hr_user"/>
+
+</odoo>
