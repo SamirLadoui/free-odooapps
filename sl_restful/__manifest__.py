@@ -48,9 +48,13 @@ when it was last used and how many calls it has made.
 
 Versions
 --------
-16.0 and later. Odoo 15.0 classifies any request carrying a Content-Type of
-``application/json`` as a JSON-RPC call, so a REST route cannot accept a normal
-JSON body on that version.
+14.0 through 19.0.
+
+On **14.0 and 15.0** Odoo hands any request carrying ``Content-Type:
+application/json`` to its own JSON-RPC dispatcher before a REST route ever sees
+it, and answers 400. Send the same JSON body with ``Content-Type: text/plain``
+on those two versions and everything else is identical - the endpoints, the
+keys, the responses and the status codes are the same.
 """,
     'author': 'Samir Ladoui',
     'maintainer': 'Samir Ladoui',
