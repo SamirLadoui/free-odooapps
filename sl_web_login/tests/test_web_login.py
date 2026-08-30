@@ -12,6 +12,17 @@ PIXEL = base64.b64encode(base64.b64decode(
 @tagged('post_install', '-at_install')
 class TestWebLogin(HttpCase):
 
+    def _flush(self):
+        """Odoo moved flushing three times: Model.flush() on 14,
+        cr.flush() on 15-16, env.flush_all() on 17+."""
+        if hasattr(self.env, 'flush_all'):
+            self.env.flush_all()
+        elif hasattr(self.env.cr, 'flush'):
+            self.env.cr.flush()
+        else:
+            self.env['base'].flush()
+
+
     def setUp(self):
         super().setUp()
         self.company = self.env['res.company']._sl_login_company()
@@ -72,7 +83,7 @@ class TestWebLogin(HttpCase):
 
     def test_image_routes_404_when_unset(self):
         self.company.write({'login_background': False, 'login_logo': False})
-        self.env.cr.flush()
+        self._flush()
         for url in ('/sl_web_login/background', '/sl_web_login/logo'):
             self.assertEqual(self.url_open(url).status_code, 404, url)
 
@@ -81,7 +92,7 @@ class TestWebLogin(HttpCase):
             'login_background': PIXEL,
             'login_footer_text': 'Need help? support@example.com',
         })
-        self.env.cr.flush()
+        self._flush()
         response = self.url_open('/web/login')
         self.assertEqual(response.status_code, 200)
         self.assertIn('/sl_web_login/style.css', response.text)
@@ -89,5 +100,5 @@ class TestWebLogin(HttpCase):
 
     def test_hide_footer_removes_powered_by(self):
         self.company.login_hide_powered_by = True
-        self.env.cr.flush()
+        self._flush()
         self.assertNotIn('Powered by', self.url_open('/web/login').text)
