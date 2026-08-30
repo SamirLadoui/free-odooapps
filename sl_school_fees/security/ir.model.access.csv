@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fee_structure_user,sl.fee.structure.user,model_sl_fee_structure,sl_school.group_school_user,1,0,0,0
+access_fee_structure_manager,sl.fee.structure.manager,model_sl_fee_structure,sl_school.group_school_manager,1,1,1,1
+access_fee_structure_line_user,sl.fee.structure.line.user,model_sl_fee_structure_line,sl_school.group_school_user,1,0,0,0
+access_fee_structure_line_manager,sl.fee.structure.line.manager,model_sl_fee_structure_line,sl_school.group_school_manager,1,1,1,1
+access_fee_user,sl.fee.user,model_sl_fee,sl_school.group_school_user,1,1,1,0
+access_fee_manager,sl.fee.manager,model_sl_fee,sl_school.group_school_manager,1,1,1,1
