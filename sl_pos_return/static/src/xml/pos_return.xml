@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="sl_pos_return.ReturnButton">
+        <button class="control-button btn btn-light rounded-0 fw-bolder"
+                t-on-click="onClick">
+            <i class="fa fa-undo me-1" role="img" aria-label="Return"
+               title="Return"/>
+            <span>Return</span>
+        </button>
+    </t>
+
+</templates>
