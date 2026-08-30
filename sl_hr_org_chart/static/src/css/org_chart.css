@@ -1,0 +1,78 @@
+.sl_org_page { padding: 1rem; background: #f8f9fa; min-height: 100vh; }
+
+.sl_org_header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-bottom: .75rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.sl_org_header h3 { margin: 0; }
+.sl_org_header button { margin-left: auto; }
+
+.sl_org_body { overflow: auto; }
+
+/* Nested lists with connector lines, so the hierarchy reads without javascript. */
+.sl_org_tree, .sl_org_tree ul { list-style: none; margin: 0; padding-left: 1.5rem; }
+.sl_org_tree { padding-left: 0; }
+
+.sl_org_tree li {
+    position: relative;
+    padding: .25rem 0 .25rem 1.25rem;
+}
+
+.sl_org_tree ul > li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.4rem;
+    width: 1rem;
+    border-top: 1px solid #ced4da;
+}
+
+.sl_org_tree ul > li::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid #ced4da;
+}
+
+.sl_org_tree ul > li:last-child::after { bottom: auto; height: 1.4rem; }
+
+.sl_org_card {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .4rem .7rem;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: .3rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+.sl_org_cycle { border-color: #dc3545; }
+
+.sl_org_photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+}
+
+.sl_org_name { font-weight: 600; text-decoration: none; }
+.sl_org_job { font-size: .8125rem; color: #6c757d; }
+.sl_org_dept { font-size: .75rem; color: #adb5bd; }
+.sl_org_count { font-size: .75rem; color: #6c757d; }
+.sl_org_warn { font-size: .75rem; color: #dc3545; }
+
+.sl_org_empty { text-align: center; padding: 3rem; }
+
+@media print {
+    .sl_org_page { background: #fff; }
+    .d-print-none { display: none !important; }
+}
