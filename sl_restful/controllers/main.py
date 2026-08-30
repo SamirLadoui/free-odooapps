@@ -13,10 +13,13 @@ DEFAULT_LIMIT = 80
 
 
 def _json(payload, status=200):
-    return request.make_response(
+    # make_response only grew a status kwarg after 15.0, so the code is set on
+    # the response instead - that works on every version.
+    response = request.make_response(
         json.dumps(payload, default=str),
-        [('Content-Type', 'application/json')],
-        status=status)
+        [('Content-Type', 'application/json')])
+    response.status_code = status
+    return response
 
 
 def _error(message, status):
