@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_saleorder_document_image"
+              inherit_id="sale.report_saleorder_document"
+              name="Quotation Product Images">
+
+        <!-- The image goes above the description rather than in its own column:
+             adding a column reflows every other one and breaks layouts that
+             other modules have already adjusted. -->
+        <xpath expr="//td[@name='td_name']" position="inside">
+            <div t-if="doc.company_id.sale_report_show_image and line.product_id.image_128"
+                 class="mt-1">
+                <img class="o_sl_product_image" t-att-src="image_data_uri(line.product_id.image_128)"
+                     t-attf-style="max-height: #{doc.company_id._sale_report_image_size()}px;"
+                     alt=""/>
+            </div>
+        </xpath>
+
+    </template>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sl.sale.image</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='quotation_order_setting_container']" position="inside">
+                <setting id="sl_sale_report_image" string="Product Images On Quotations"
+                         help="Print each product's image beside its description.">
+                    <field name="sale_report_show_image"/>
+                    <div class="content-group" invisible="not sale_report_show_image">
+                        <div class="row mt16">
+                            <label for="sale_report_image_size" class="col-lg-4 o_light_label"/>
+                            <field name="sale_report_image_size"/>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
