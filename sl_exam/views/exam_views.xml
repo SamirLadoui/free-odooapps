@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_exam_list" model="ir.ui.view">
+        <field name="name">sl.exam.list</field>
+        <field name="model">sl.exam</field>
+        <field name="arch" type="xml">
+            <list string="Exams" decoration-success="state == 'published'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="standard_id"/>
+                <field name="subject_id"/>
+                <field name="date"/>
+                <field name="total_marks" optional="show"/>
+                <field name="passing_marks" optional="hide"/>
+                <field name="result_count" string="Marked"/>
+                <field name="pass_rate" widget="percentage" string="Pass Rate"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'published'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_exam_form" model="ir.ui.view">
+        <field name="name">sl.exam.form</field>
+        <field name="model">sl.exam</field>
+        <field name="arch" type="xml">
+            <form string="Exam">
+                <header>
+                    <button name="action_load_students" type="object"
+                            string="Load Students"
+                            invisible="state not in ('draft', 'marking')"/>
+                    <button name="action_start_marking" type="object"
+                            string="Start Marking" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_publish" type="object" string="Publish"
+                            class="btn-primary" invisible="state != 'marking'"
+                            confirm="Publish these results? Students will see them."/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('published', 'cancelled')"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reset to Draft"
+                            invisible="state not in ('published', 'cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,marking,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Mid-term Mathematics"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Exam">
+                            <field name="standard_id"/>
+                            <field name="subject_id"/>
+                            <field name="date"/>
+                            <field name="academic_year_id" readonly="1"/>
+                        </group>
+                        <group string="Marking">
+                            <field name="total_marks"/>
+                            <field name="passing_marks"/>
+                            <field name="result_count" readonly="1"/>
+                            <field name="passed_count" readonly="1"/>
+                            <field name="pass_rate" widget="percentage" readonly="1"/>
+                            <field name="average_marks" readonly="1"/>
+                            <field name="highest_marks" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Mark Sheet" name="results">
+                            <field name="result_ids"
+                                   readonly="state in ('published', 'cancelled')">
+                                <list editable="bottom"
+                                      decoration-success="passed"
+                                      decoration-danger="marked and not passed"
+                                      decoration-muted="absent">
+                                    <field name="student_id"/>
+                                    <field name="absent"/>
+                                    <field name="marked"/>
+                                    <field name="marks"/>
+                                    <field name="total_marks" readonly="1"/>
+                                    <field name="percentage" widget="percentage" readonly="1"/>
+                                    <field name="grade" readonly="1"/>
+                                    <field name="passed" readonly="1"/>
+                                    <field name="remark"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_exam_search" model="ir.ui.view">
+        <field name="name">sl.exam.search</field>
+        <field name="model">sl.exam</field>
+        <field name="arch" type="xml">
+            <search string="Exams">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="standard_id"/>
+                <field name="subject_id"/>
+                <filter name="filter_marking" string="Being Marked"
+                        domain="[('state', '=', 'marking')]"/>
+                <filter name="filter_published" string="Published"
+                        domain="[('state', '=', 'published')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_standard" string="Class"
+                            context="{'group_by': 'standard_id'}"/>
+                    <filter name="group_subject" string="Subject"
+                            context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_exam" model="ir.actions.act_window">
+        <field name="name">Exams</field>
+        <field name="res_model">sl.exam</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Plan your first exam</p>
+            <p>
+                Set the class, subject and marks, press Start Marking to load the
+                students, then publish once every paper is marked.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_exam_result_list" model="ir.ui.view">
+        <field name="name">sl.exam.result.list</field>
+        <field name="model">sl.exam.result</field>
+        <field name="arch" type="xml">
+            <list string="Results" create="false"
+                  decoration-success="passed" decoration-muted="absent">
+                <field name="exam_id"/>
+                <field name="student_id"/>
+                <field name="subject_id"/>
+                <field name="marks"/>
+                <field name="percentage" widget="percentage"/>
+                <field name="grade"/>
+                <field name="passed"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_exam_result" model="ir.actions.act_window">
+        <field name="name">Results</field>
+        <field name="res_model">sl.exam.result</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_student_form_exam" model="ir.ui.view">
+        <field name="name">sl.student.form.exam</field>
+        <field name="model">sl.student</field>
+        <field name="inherit_id" ref="sl_school.view_student_form"/>
+        <field name="arch" type="xml">
+            <page name="electives" position="after">
+                <page string="Exam Results" name="exams">
+                    <group>
+                        <field name="exam_average" widget="percentage" readonly="1"/>
+                    </group>
+                    <field name="exam_result_ids" readonly="1">
+                        <list decoration-success="passed" decoration-muted="absent">
+                            <field name="exam_id"/>
+                            <field name="subject_id"/>
+                            <field name="marks"/>
+                            <field name="percentage" widget="percentage"/>
+                            <field name="grade"/>
+                            <field name="passed"/>
+                        </list>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <menuitem id="menu_exam" name="Exams"
+              parent="sl_school.menu_school_root" action="action_exam" sequence="16"/>
+    <menuitem id="menu_exam_result" name="Exam Results"
+              parent="sl_school.menu_school_organisation" action="action_exam_result"
+              sequence="41"/>
+
+</odoo>
