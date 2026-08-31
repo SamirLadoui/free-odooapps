@@ -28,7 +28,7 @@ Start a timer when you begin a task and stop it when you finish. The elapsed tim
 
 ## Supported Versions
 
-`18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

@@ -27,7 +27,7 @@ Replace the stock Odoo login screen with your own background, logo, colours and 
 
 ## Supported Versions
 
-`15.0` `16.0` `17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 
