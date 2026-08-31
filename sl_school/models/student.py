@@ -62,6 +62,29 @@ class Student(models.Model):
          'That roll number is already taken in this class.'),
     ]
 
+    @api.constrains('code')
+    def _check_code_unique(self):
+        """19.0 dropped support for _sql_constraints, so it is enforced here
+        as well and the rule holds on every version."""
+        for record in self.filtered('code'):
+            if self.search_count([
+                    ('id', '!=', record.id),
+                    ('code', '=', record.code),
+            ]):
+                raise ValidationError(_("That student number is already used."))
+
+    @api.constrains('standard_id', 'roll_number')
+    def _check_roll_number_unique(self):
+        """19.0 dropped support for _sql_constraints, so it is enforced here
+        as well and the rule holds on every version."""
+        for record in self.filtered('roll_number'):
+            if self.search_count([
+                    ('id', '!=', record.id),
+                    ('standard_id', '=', record.standard_id.id),
+                    ('roll_number', '=', record.roll_number),
+            ]):
+                raise ValidationError(_("That roll number is already used in this class."))
+
     @api.depends('name', 'code')
     def _compute_display_name(self):
         for student in self:

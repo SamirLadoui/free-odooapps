@@ -3,6 +3,7 @@ from datetime import date, timedelta
 
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
+from odoo import fields
 
 
 @tagged('post_install', '-at_install')
@@ -11,6 +12,16 @@ class TestSchoolFees(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # A bare database has no chart of accounts, so there is no sales
+        # journal for the invoice to land in.
+        cls.journal = cls.env['account.journal'].search(
+            [('type', '=', 'sale'),
+             ('company_id', '=', cls.env.company.id)], limit=1)
+        if not cls.journal:
+            cls.journal = cls.env['account.journal'].create({
+                'name': 'Fees Sales', 'code': 'FSAL', 'type': 'sale',
+                'company_id': cls.env.company.id})
+        cls.books = cls._ensure_accounting()
         cls.year = cls.env['sl.academic.year'].create({
             'name': '2026 / 2027', 'code': 'AY-FEE',
             'date_start': date(2026, 9, 1), 'date_end': date(2027, 6, 30)})
@@ -21,6 +32,12 @@ class TestSchoolFees(TransactionCase):
         cls.student = cls.env['sl.student'].create({
             'name': 'Fee Payer', 'standard_id': cls.standard.id})
         cls.student.action_enrol()
+        # Enrolment creates the contact; give it somewhere to post, since a
+        # bare database has no chart of accounts to default from.
+        cls.student.partner_id.write({
+            'property_account_receivable_id': cls.books['receivable'].id,
+            'property_account_payable_id': cls.books['payable'].id,
+        })
 
         cls.structure = cls.env['sl.fee.structure'].create({
             'name': 'Grade 5 Annual', 'academic_year_id': cls.year.id,
@@ -109,7 +126,7 @@ class TestSchoolFees(TransactionCase):
         self.assertTrue(fee.is_overdue)
 
     def test_a_future_due_date_is_not_overdue(self):
-        fee = self._fee(date_due=date.today() + timedelta(days=30))
+        fee = self._fee(date_due=fields.Date.context_today(self.env.user) + timedelta(days=30))
         self.assertFalse(fee.is_overdue)
 
     def test_a_paid_fee_is_never_overdue(self):
@@ -174,3 +191,43 @@ class TestSchoolFees(TransactionCase):
         self.student.invalidate_recordset(['fee_total', 'fee_outstanding'])
         self.assertEqual(self.student.fee_total, 0.0)
         self.assertEqual(self.student.fee_outstanding, 0.0)
+
+    @classmethod
+    def _ensure_accounting(cls):
+        """A bare database has no chart of accounts.
+
+        Without one the customer has no receivable account, so the balancing
+        line Odoo adds to the invoice has nowhere to post and the database
+        rejects the whole move.
+        """
+        accounts = cls.env['account.account']
+        modern = 'account_type' in accounts._fields
+        legacy_type = {
+            'income': 'account.data_account_type_revenue',
+            'asset_receivable': 'account.data_account_type_receivable',
+            'liability_payable': 'account.data_account_type_payable',
+        }
+
+        def account_of(kind, name, code):
+            if modern:
+                found = accounts.search([('account_type', '=', kind)], limit=1)
+            else:
+                found = accounts.search(
+                    [('user_type_id', '=', cls.env.ref(legacy_type[kind]).id)],
+                    limit=1)
+            if found:
+                return found
+            values = {'name': name, 'code': code}
+            if modern:
+                values['account_type'] = kind
+            else:
+                values['user_type_id'] = cls.env.ref(legacy_type[kind]).id
+            if kind != 'income':
+                values['reconcile'] = True
+            return accounts.create(values)
+
+        return {
+            'income': account_of('income', 'Fees Income', 'FINC01'),
+            'receivable': account_of('asset_receivable', 'Fees Receivable', 'FREC01'),
+            'payable': account_of('liability_payable', 'Fees Payable', 'FPAY01'),
+        }

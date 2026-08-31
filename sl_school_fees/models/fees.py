@@ -157,6 +157,12 @@ class Fee(models.Model):
         if not journal:
             raise UserError(_("No sales journal, so an invoice cannot be created."))
 
+        account = self._fee_income_account(journal)
+        if not account:
+            raise UserError(_(
+                "No income account, so an invoice line cannot be created. "
+                "Set up a chart of accounts first."))
+
         invoice = self.env['account.move'].create({
             'move_type': 'out_invoice',
             'partner_id': partner.id,
@@ -167,11 +173,26 @@ class Fee(models.Model):
                 'name': '%s - %s' % (self.structure_id.name, self.student_id.name),
                 'quantity': 1.0,
                 'price_unit': self.amount,
+                'account_id': account.id,
             })],
         })
         self.write({'invoice_id': invoice.id, 'state': 'invoiced'})
         self.message_post(body=_("Invoice %s created.") % invoice.name)
         return invoice
+
+    def _fee_income_account(self, journal):
+        """Where a fee line posts.
+
+        Built directly rather than through the invoice's onchanges, so nothing
+        fills the account in for us and the database refuses a line without
+        one.
+        """
+        self.ensure_one()
+        if 'default_account_id' in journal._fields and journal.default_account_id:
+            return journal.default_account_id
+        accounts = self.env['account.account']
+        domain_field = 'account_type' if 'account_type' in accounts._fields             else 'internal_group'
+        return accounts.search([(domain_field, '=', 'income')], limit=1)
 
     def action_mark_paid(self):
         for fee in self:

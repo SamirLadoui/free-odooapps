@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sl_data_cleanup_form" model="ir.ui.view">
+        <field name="name">sl.data.cleanup.form</field>
+        <field name="model">sl.data.cleanup</field>
+        <field name="arch" type="xml">
+            <form string="Remove Data">
+                <div class="alert alert-warning" role="alert">
+                    <strong>This cannot be undone.</strong>
+                    Removing data is meant for clearing a database before you
+                    go live. Take a backup first.
+                </div>
+                <group>
+                    <group string="Documents">
+                        <field name="remove_sales"/>
+                        <field name="remove_purchases"/>
+                        <field name="remove_invoices"/>
+                        <field name="remove_stock"/>
+                        <field name="remove_manufacturing"/>
+                        <field name="remove_pos"/>
+                        <field name="remove_leads"/>
+                    </group>
+                    <group string="Master Data">
+                        <field name="remove_products"/>
+                        <field name="remove_partners"/>
+                    </group>
+                </group>
+                <group string="Confirm">
+                    <field name="database_name" readonly="1"/>
+                    <field name="confirmation"
+                           placeholder="Type the database name here"/>
+                </group>
+                <group string="Result">
+                    <field name="preview" nolabel="1" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_preview" type="object"
+                            string="Count First" class="btn-secondary"/>
+                    <button name="action_remove" type="object"
+                            string="Remove Data" class="btn-danger"
+                            confirm="This permanently removes the selected data. Continue?"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sl_data_cleanup" model="ir.actions.act_window">
+        <field name="name">Remove Data</field>
+        <field name="res_model">sl.data.cleanup</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sl_data_cleanup"
+              name="Remove Data"
+              parent="base.menu_administration"
+              action="action_sl_data_cleanup"
+              groups="base.group_system"
+              sequence="90"/>
+
+</odoo>

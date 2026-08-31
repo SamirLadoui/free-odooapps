@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
+from odoo import fields
 
 
 @tagged('post_install', '-at_install')
@@ -60,7 +61,7 @@ class TestHospital(TransactionCase):
     def test_birth_date_cannot_be_in_the_future(self):
         with self.assertRaises(ValidationError):
             self.env['sl.hospital.patient'].create({
-                'name': 'Future', 'birth_date': date.today() + timedelta(days=1)})
+                'name': 'Future', 'birth_date': fields.Date.context_today(self.env.user) + timedelta(days=1)})
 
     def test_patient_email_is_checked(self):
         with self.assertRaises(ValidationError):

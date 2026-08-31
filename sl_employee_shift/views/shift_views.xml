@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_shift_list" model="ir.ui.view">
+        <field name="name">sl.shift.list</field>
+        <field name="model">sl.shift</field>
+        <field name="arch" type="xml">
+            <list string="Shifts" editable="bottom">
+                <field name="name"/>
+                <field name="code" optional="show"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+                <field name="break_minutes"/>
+                <field name="duration" widget="float_time" readonly="1"/>
+                <field name="overnight" readonly="1"/>
+                <field name="assignment_count" string="Assigned" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_shift_form" model="ir.ui.view">
+        <field name="name">sl.shift.form</field>
+        <field name="model">sl.shift</field>
+        <field name="arch" type="xml">
+            <form string="Shift">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Night Shift"/></h1>
+                    </div>
+                    <group>
+                        <group string="Hours">
+                            <field name="start_time" widget="float_time"/>
+                            <field name="end_time" widget="float_time"/>
+                            <field name="break_minutes"/>
+                            <field name="duration" widget="float_time" readonly="1"/>
+                        </group>
+                        <group string="Other">
+                            <field name="code"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="overnight" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="status" invisible="not overnight">
+                        This shift ends earlier than it starts, so it runs past
+                        midnight. The paid hours above account for that.
+                    </div>
+                    <notebook>
+                        <page string="Assignments" name="assignments">
+                            <field name="assignment_ids" readonly="1">
+                                <list>
+                                    <field name="employee_id"/>
+                                    <field name="department_id"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_shift" model="ir.actions.act_window">
+        <field name="name">Shifts</field>
+        <field name="res_model">sl.shift</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Define your shifts</p>
+            <p>A shift ending earlier than it starts runs overnight, and the paid
+               hours are worked out accordingly.</p>
+        </field>
+    </record>
+
+    <record id="view_shift_assignment_list" model="ir.ui.view">
+        <field name="name">sl.shift.assignment.list</field>
+        <field name="model">sl.shift.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Shift Assignments" editable="bottom">
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="shift_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_shift_assignment_search" model="ir.ui.view">
+        <field name="name">sl.shift.assignment.search</field>
+        <field name="model">sl.shift.assignment</field>
+        <field name="arch" type="xml">
+            <search string="Shift Assignments">
+                <field name="employee_id"/>
+                <field name="shift_id"/>
+                <field name="department_id"/>
+                <filter name="filter_current" string="Current"
+                        domain="[('date_from', '&lt;=', 'today'),
+                                 '|', ('date_to', '=', False),
+                                      ('date_to', '&gt;=', 'today')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_shift" string="Shift"
+                            context="{'group_by': 'shift_id'}"/>
+                    <filter name="group_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_shift_assignment" model="ir.actions.act_window">
+        <field name="name">Shift Assignments</field>
+        <field name="res_model">sl.shift.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_current': 1}</field>
+    </record>
+
+    <record id="view_employee_form_shift" model="ir.ui.view">
+        <field name="name">hr.employee.form.shift</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <field name="job_title" position="after">
+                <field name="current_shift_id" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
+    <menuitem id="menu_shift_assignment" name="Shift Assignments"
+              parent="hr.menu_hr_root" action="action_shift_assignment"
+              sequence="48" groups="hr.group_hr_user"/>
+    <menuitem id="menu_shift" name="Shifts"
+              parent="hr.hr_menu_configuration" action="action_shift"
+              sequence="49" groups="hr.group_hr_manager"/>
+
+</odoo>

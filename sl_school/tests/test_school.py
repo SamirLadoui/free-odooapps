@@ -5,6 +5,12 @@ import psycopg2
 
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
+from odoo import fields
+
+# Up to 18.0 a duplicate trips the database constraint; 19.0 dropped support
+# for _sql_constraints, so the python constraint raises instead. Both mean the
+# same thing: the duplicate was refused.
+UNIQUE_ERRORS = (psycopg2.IntegrityError, ValidationError)
 from odoo.tools import mute_logger
 
 
@@ -67,9 +73,13 @@ class TestSchool(TransactionCase):
     @mute_logger('odoo.sql_db')
     def test_roll_number_unique_per_class(self):
         self._student('First', roll_number=1)
-        with self.assertRaises(psycopg2.IntegrityError):
+        try:
             with self.cr.savepoint():
                 self._student('Second', roll_number=1)
+        except UNIQUE_ERRORS:
+            pass
+        else:
+            self.fail('the duplicate was accepted')
 
     def test_same_roll_number_allowed_in_another_class(self):
         other = self.env['sl.school.standard'].create({
@@ -90,7 +100,7 @@ class TestSchool(TransactionCase):
 
     def test_birth_date_cannot_be_in_the_future(self):
         with self.assertRaises(ValidationError):
-            self._student('Time Traveller', birth_date=date.today() + timedelta(days=1))
+            self._student('Time Traveller', birth_date=fields.Date.context_today(self.env.user) + timedelta(days=1))
 
     def test_enrolling_requires_a_class(self):
         student = self.env['sl.student'].create({'name': 'No Class'})

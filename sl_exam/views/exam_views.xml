@@ -146,6 +146,7 @@
                 <field name="percentage" widget="percentage"/>
                 <field name="grade"/>
                 <field name="passed"/>
+                <field name="absent" invisible="1"/><!-- drives decoration-muted; 14.0 wants it in the view -->
             </list>
         </field>
     </record>
@@ -174,6 +175,7 @@
                             <field name="percentage" widget="percentage"/>
                             <field name="grade"/>
                             <field name="passed"/>
+                            <field name="absent" invisible="1"/><!-- drives decoration-muted; 14.0 wants it in the view -->
                         </list>
                     </field>
                 </page>

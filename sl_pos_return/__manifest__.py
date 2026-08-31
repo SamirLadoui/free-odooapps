@@ -36,6 +36,9 @@ does not get the button.
         'views/pos_config_views.xml',
     ],
     'assets': {
+        'web.assets_tests': [
+            'sl_pos_return/static/tests/tours/**/*',
+        ],
         'point_of_sale._assets_pos': [
             'sl_pos_return/static/src/js/pos_return.js',
             'sl_pos_return/static/src/xml/pos_return.xml',

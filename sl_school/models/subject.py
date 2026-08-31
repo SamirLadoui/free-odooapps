@@ -24,6 +24,17 @@ class Subject(models.Model):
         ('code_unique', 'unique(code)', 'That subject code is already used.'),
     ]
 
+    @api.constrains('code')
+    def _check_code_unique(self):
+        """19.0 dropped support for _sql_constraints, so it is enforced here
+        as well and the rule holds on every version."""
+        for record in self.filtered('code'):
+            if self.search_count([
+                    ('id', '!=', record.id),
+                    ('code', '=', record.code),
+            ]):
+                raise ValidationError(_("That subject code is already used."))
+
     @api.constrains('credits')
     def _check_credits(self):
         for subject in self:

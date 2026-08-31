@@ -33,6 +33,19 @@ class SchoolStandard(models.Model):
          'That grade and division already exists for this academic year.'),
     ]
 
+    @api.constrains('name', 'division', 'academic_year_id')
+    def _check_grade_unique(self):
+        """19.0 dropped support for _sql_constraints, so it is enforced here
+        as well and the rule holds on every version."""
+        for record in self.filtered('academic_year_id'):
+            if self.search_count([
+                    ('id', '!=', record.id),
+                    ('name', '=', record.name),
+                    ('division', '=', record.division),
+                    ('academic_year_id', '=', record.academic_year_id.id),
+            ]):
+                raise ValidationError(_("That grade and division already exists for this academic year."))
+
     @api.depends('name', 'division', 'academic_year_id.name')
     def _compute_display_name(self):
         for standard in self:
