@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Before 16.0 the setting is set on the point of sale itself: the
+         Settings page has no per-config section to hang it on. -->
+    <record id="pos_config_view_form_sl_return" model="ir.ui.view">
+        <field name="name">pos.config.form.sl.return</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='iface_print_auto']" position="after">
+                <field name="sl_allow_returns"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pos_order_form_sl_return" model="ir.ui.view">
+        <field name="name">pos.order.form.sl.return</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sl_return_of_order_id" readonly="1"
+                       attrs="{'invisible': [('sl_return_of_order_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

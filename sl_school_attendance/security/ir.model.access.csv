@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_attendance_user,sl.school.attendance.user,model_sl_school_attendance,sl_school.group_school_user,1,1,1,0
+access_attendance_manager,sl.school.attendance.manager,model_sl_school_attendance,sl_school.group_school_manager,1,1,1,1
+access_attendance_line_user,sl.school.attendance.line.user,model_sl_school_attendance_line,sl_school.group_school_user,1,1,1,1
+access_attendance_line_manager,sl.school.attendance.line.manager,model_sl_school_attendance_line,sl_school.group_school_manager,1,1,1,1

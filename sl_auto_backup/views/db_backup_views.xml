@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_db_backup_list" model="ir.ui.view">
+        <field name="name">db.backup.list</field>
+        <field name="model">db.backup</field>
+        <field name="arch" type="xml">
+            <tree string="Backups" decoration-danger="last_state == 'fail'">
+                <field name="db_name"/>
+                <field name="method"/>
+                <field name="folder" optional="show"/>
+                <field name="backup_format"/>
+                <field name="autoremove" optional="hide"/>
+                <field name="days_to_keep" optional="hide"/>
+                <field name="last_run"/>
+                <field name="last_state" widget="badge"
+                       decoration-success="last_state == 'ok'"
+                       decoration-danger="last_state == 'fail'"/>
+                <button name="action_backup" type="object" string="Back Up Now"
+                        icon="fa-download" class="btn-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_db_backup_form" model="ir.ui.view">
+        <field name="name">db.backup.form</field>
+        <field name="model">db.backup</field>
+        <field name="arch" type="xml">
+            <form string="Backup">
+                <header>
+                    <button name="action_backup" type="object" string="Back Up Now"
+                            class="btn-primary"/>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <div class="oe_title">
+                        <label for="db_name"/>
+                        <h1><field name="db_name" placeholder="my_database"/></h1>
+                    </div>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <group>
+                        <group string="Destination">
+                            <field name="method" widget="radio"/>
+                            <field name="folder" attrs="{'invisible': [('method', '!=', 'local')], 'required': [('method', '=', 'local')]}"/>
+                            <field name="sftp_host" attrs="{'invisible': [('method', '!=', 'sftp')], 'required': [('method', '=', 'sftp')]}"/>
+                            <field name="sftp_port" attrs="{'invisible': [('method', '!=', 'sftp')]}"/>
+                            <field name="sftp_user" attrs="{'invisible': [('method', '!=', 'sftp')], 'required': [('method', '=', 'sftp')]}"/>
+                            <field name="sftp_password" password="True" attrs="{'invisible': [('method', '!=', 'sftp')]}"/>
+                            <field name="sftp_path" attrs="{'invisible': [('method', '!=', 'sftp')], 'required': [('method', '=', 'sftp')]}"/>
+                        </group>
+                        <group string="Options">
+                            <field name="backup_format"/>
+                            <field name="autoremove"/>
+                            <field name="days_to_keep" attrs="{'invisible': [('autoremove', '=', False)], 'required': [('autoremove', '!=', False)]}"/>
+                            <field name="notify_email" widget="email"
+                                   placeholder="ops@example.com"/>
+                        </group>
+                    </group>
+                    <group string="Last Run" attrs="{'invisible': [('last_run', '=', False)]}">
+                        <field name="last_run"/>
+                        <field name="last_state"/>
+                        <field name="last_message"/>
+                    </group>
+                    <div class="alert alert-info" role="status" attrs="{'invisible': [('method', '!=', 'sftp')]}">
+                        The SFTP destination requires the <code>paramiko</code> Python
+                        package on the Odoo server.
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_db_backup_search" model="ir.ui.view">
+        <field name="name">db.backup.search</field>
+        <field name="model">db.backup</field>
+        <field name="arch" type="xml">
+            <search string="Backups">
+                <field name="db_name"/>
+                <field name="folder"/>
+                <filter name="filter_failed" string="Failed"
+                        domain="[('last_state', '=', 'fail')]"/>
+                <filter name="filter_local" string="Local"
+                        domain="[('method', '=', 'local')]"/>
+                <filter name="filter_sftp" string="SFTP"
+                        domain="[('method', '=', 'sftp')]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_method" string="Destination"
+                            context="{'group_by': 'method'}"/>
+                    <filter name="group_state" string="Last Result"
+                            context="{'group_by': 'last_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_db_backup" model="ir.actions.act_window">
+        <field name="name">Scheduled Backups</field>
+        <field name="res_model">db.backup</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Schedule your first backup</p>
+            <p>
+                Each record dumps one database to a local directory or a remote
+                SFTP server, on the schedule set in the Automated Backup action.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_db_backup_root" name="Backups"
+              parent="base.menu_administration" sequence="60"
+              groups="base.group_system"/>
+    <menuitem id="menu_db_backup" name="Scheduled Backups"
+              parent="menu_db_backup_root" action="action_db_backup" sequence="10"/>
+
+</odoo>

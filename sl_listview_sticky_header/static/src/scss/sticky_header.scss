@@ -1,0 +1,22 @@
+// Scroll far enough down a long list and the column headings go off screen, so
+// you lose track of which column is which. Pin them to the top of the list.
+.o_list_renderer .o_list_table > thead {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+
+.o_list_renderer .o_list_table > thead > tr > th {
+    position: sticky;
+    top: 0;
+    // The heading row must be opaque, or rows scroll visibly behind it.
+    background-color: var(--o-list-header-bg, #f9f9f9);
+}
+
+// The totals row is as useful as the headings on a long list, so pin it too.
+.o_list_renderer .o_list_table > tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    background-color: var(--o-list-footer-bg, #f9f9f9);
+}

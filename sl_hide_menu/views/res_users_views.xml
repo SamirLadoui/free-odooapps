@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_hide_menu" model="ir.ui.view">
+        <field name="name">res.users.form.hide.menu</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group string="Hidden Menus" name="sl_hidden_menus">
+                    <field name="hidden_menu_ids" widget="many2many_tags"
+                           nolabel="1" options="{'no_create': True}"
+                           placeholder="Menus this user will not see"/>
+                    <div class="text-muted">
+                        Hiding a menu removes it from this user's interface and
+                        takes its sub-menus with it. It does not change any access
+                        right: anything they could reach by other means, they still can.
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

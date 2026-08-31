@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import inspect
+
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
@@ -138,7 +140,12 @@ class TestMassLabel(TransactionCase):
     def test_the_sheet_renders(self):
         wizard = self._wizard(columns=2, rows=2, show_price=True)
         report = self.env.ref('sl_mass_label.action_report_label_sheet')
-        html, _t = report._render_qweb_html(wizard.ids)
+        # 16.0 added report_ref as the first argument.
+        if 'report_ref' in inspect.signature(
+                report._render_qweb_html).parameters:
+            html, _t = report._render_qweb_html(report.report_name, wizard.ids)
+        else:
+            html, _t = report._render_qweb_html(wizard.ids)
         html = html.decode()
         self.assertIn('Label Product 0', html)
         self.assertIn('LP0', html)

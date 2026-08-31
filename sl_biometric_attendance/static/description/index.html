@@ -1,0 +1,112 @@
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h2 class="oe_slogan">Biometric Device Attendance</h2>
+            <h3 class="oe_slogan">Turn Fingerprint Punches Into Hours Worked</h3>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <p class="oe_mt32">Connect Odoo to your ZKTeco fingerprint or face terminals and download their punches as real attendance records. A device gives you a flat list of times; turning that into hours worked is where this module does its work.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Key Features</h3>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Double Presses Dropped</h4>
+            <p class="oe_mt8 text-center">Two punches within a minute are one person pressing twice because the beep was not obvious. The window is configurable per device, and the debounce is per person so two people arriving together are both recorded.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Punches Paired Into Shifts</h4>
+            <p class="oe_mt8 text-center">Four punches in a day become a morning and an afternoon, not four mysteries. Each person&#x27;s punches are paired independently.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">An Open Shift Stays Open</h4>
+            <p class="oe_mt8 text-center">Somebody who has not checked out yet gets a record with no check-out. Inventing an end time would be a lie, and payroll would believe it.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Safe To Download Twice</h4>
+            <p class="oe_mt8 text-center">Punches already imported are skipped, so running the download again, or letting the cron overlap a manual pull, never doubles anyone&#x27;s hours.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Unmapped Ids Are Reported</h4>
+            <p class="oe_mt8 text-center">A punch from a device id with no employee behind it is named in the result rather than silently dropped or guessed at, so you can see exactly who needs mapping.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">One Dead Terminal Does Not Stop The Rest</h4>
+            <p class="oe_mt8 text-center">The hourly download isolates each device, and records the outcome of the last attempt on the device itself, good or bad.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Getting Started</h3>
+        <div class="oe_span12">
+            <ol style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Install pyzk on the Odoo server: pip install pyzk</li>
+                <li class="oe_mt8">Install the module and open Employees &gt; Configuration &gt; Biometric Devices.</li>
+                <li class="oe_mt8">Add your device, press Test Connection, then Download Attendance.</li>
+                <li class="oe_mt8">Give each employee the Biometric ID they are enrolled under on the device.</li>
+                <li class="oe_mt8">Enable the Biometric Devices: Download Attendance scheduled action. It ships disabled.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Good To Know</h3>
+        <div class="oe_span12">
+            <ul style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Odoo connects over your network, so the terminal must be reachable from the Odoo server itself.</li>
+                <li class="oe_mt8">Two employees cannot share a Biometric ID, because that would silently merge their hours.</li>
+                <li class="oe_mt8">Without pyzk the module installs and configures cleanly and tells you what is missing the first time you connect.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <h3>Supported Odoo Versions</h3>
+            <p class="oe_mt16"><strong>18.0 &middot; 19.0</strong></p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Contact Us</h3>
+        <div class="oe_span12 text-center">
+            <p class="oe_mt16">
+                If you have any queries or need support for this module, feel free to contact us.
+            </p>
+            <p class="oe_mt16">
+                <a href="https://www.linkedin.com/in/samir-ladoui" target="_blank" class="oe_social_media">
+                    <i class="fa fa-linkedin-square fa-2x"></i> LinkedIn: samir-ladoui
+                </a>
+                <a href="https://wa.me/+213658127254" target="_blank" class="oe_social_media"
+                    style="margin-left: 20px;">
+                    <i class="fa fa-whatsapp fa-2x"></i> WhatsApp: +213658127254
+                </a>
+            </p>
+            <p class="oe_mt8">
+                Email: <a href="mailto:samir.odoo.apps2325@gmail.com">samir.odoo.apps2325@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>
