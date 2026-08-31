@@ -29,7 +29,7 @@ Non-conformities, root cause analysis and corrective actions, with a workflow th
 
 ## Supported Versions
 
-`19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

@@ -28,7 +28,7 @@ Set the lines and the recurrence once, and the invoices generate on schedule. Ev
 
 ## Supported Versions
 
-`17.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 
