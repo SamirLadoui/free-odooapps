@@ -24,7 +24,7 @@ Scroll a few hundred rows down a list and the column headings are long gone, lea
 
 ## Supported Versions
 
-`17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

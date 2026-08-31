@@ -27,7 +27,7 @@ Pick the menus a particular user does not need and they disappear from their int
 
 ## Supported Versions
 
-`18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 
