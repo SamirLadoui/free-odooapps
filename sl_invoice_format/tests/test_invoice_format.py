@@ -13,11 +13,22 @@ class TestInvoiceFormat(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({'name': 'Format Customer'})
+        books = cls._ensure_accounting()
         cls.product = cls.env['product.product'].create({
             'name': 'Formatted Product', 'default_code': 'FMT-1',
-            'list_price': 50.0, 'type': 'service'})
+            'list_price': 50.0, 'type': 'service',
+            'property_account_income_id': books['income'].id})
+        cls.partner.write({
+            'property_account_receivable_id': books['receivable'].id,
+            'property_account_payable_id': books['payable'].id,
+        })
         journal = cls.env['account.journal'].search(
             [('type', '=', 'sale'), ('company_id', '=', cls.company.id)], limit=1)
+        if not journal:
+            # A bare database has no chart of accounts and so no sale journal.
+            journal = cls.env['account.journal'].create({
+                'name': 'Invoice Format Sales', 'code': 'IFSAL',
+                'type': 'sale', 'company_id': cls.company.id})
         cls.invoice = cls.env['account.move'].create({
             'move_type': 'out_invoice',
             'partner_id': cls.partner.id,
@@ -119,3 +130,39 @@ class TestInvoiceFormat(TransactionCase):
         self.company.invoice_show_product_image = True
         html = self._render()
         self.assertIn('Formatted line', html, "the invoice must still render")
+
+    @classmethod
+    def _ensure_accounting(cls):
+        """A bare database has no chart of accounts, so an invoice line has no
+        income account and the customer no receivable to balance against."""
+        accounts = cls.env['account.account']
+        modern = 'account_type' in accounts._fields
+        legacy = {
+            'income': 'account.data_account_type_revenue',
+            'asset_receivable': 'account.data_account_type_receivable',
+            'liability_payable': 'account.data_account_type_payable',
+        }
+
+        def account_of(kind, name, code):
+            if modern:
+                found = accounts.search([('account_type', '=', kind)], limit=1)
+            else:
+                found = accounts.search(
+                    [('user_type_id', '=', cls.env.ref(legacy[kind]).id)],
+                    limit=1)
+            if found:
+                return found
+            values = {'name': name, 'code': code}
+            if modern:
+                values['account_type'] = kind
+            else:
+                values['user_type_id'] = cls.env.ref(legacy[kind]).id
+            if kind != 'income':
+                values['reconcile'] = True
+            return accounts.create(values)
+
+        return {
+            'income': account_of('income', 'Format Income', 'FMTI01'),
+            'receivable': account_of('asset_receivable', 'Format Receivable', 'FMTR01'),
+            'payable': account_of('liability_payable', 'Format Payable', 'FMTP01'),
+        }

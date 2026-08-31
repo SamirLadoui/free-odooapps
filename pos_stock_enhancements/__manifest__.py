@@ -42,6 +42,9 @@ check.
     'depends': ['point_of_sale', 'stock'],
     'data': ['views/pos_config_views.xml'],
     'assets': {
+        'web.assets_tests': [
+            'pos_stock_enhancements/static/tests/tours/**/*',
+        ],
         'point_of_sale._assets_pos': [
             'pos_stock_enhancements/static/src/js/pos_stock.js',
         ],

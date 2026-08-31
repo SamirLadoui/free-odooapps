@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_subject_list" model="ir.ui.view">
+        <field name="name">sl.subject.list</field>
+        <field name="model">sl.subject</field>
+        <field name="arch" type="xml">
+            <list string="Subjects">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="subject_type"/>
+                <field name="credits"/>
+                <field name="is_elective"/>
+                <field name="teacher_ids" widget="many2many_tags" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_subject_form" model="ir.ui.view">
+        <field name="name">sl.subject.form</field>
+        <field name="model">sl.subject</field>
+        <field name="arch" type="xml">
+            <form string="Subject">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Mathematics"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code" placeholder="MATH"/>
+                            <field name="subject_type"/>
+                        </group>
+                        <group>
+                            <field name="credits"/>
+                            <field name="is_elective"/>
+                        </group>
+                    </group>
+                    <group string="Teachers">
+                        <field name="teacher_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_subject_search" model="ir.ui.view">
+        <field name="name">sl.subject.search</field>
+        <field name="model">sl.subject</field>
+        <field name="arch" type="xml">
+            <search string="Subjects">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="teacher_ids"/>
+                <filter name="filter_elective" string="Elective"
+                        domain="[('is_elective', '=', True)]"/>
+                <filter name="filter_core" string="Core"
+                        domain="[('is_elective', '=', False)]"/>
+                <group>
+                    <filter name="group_type" string="Type"
+                            context="{'group_by': 'subject_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_subject" model="ir.actions.act_window">
+        <field name="name">Subjects</field>
+        <field name="res_model">sl.subject</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

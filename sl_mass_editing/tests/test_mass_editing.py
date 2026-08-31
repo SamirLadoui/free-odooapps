@@ -6,31 +6,38 @@ from odoo.tests import TransactionCase, tagged
 @tagged('post_install', '-at_install')
 class TestMassEditing(TransactionCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.partner_model = cls.env['ir.model']._get('res.partner')
-        cls.f = lambda name: None  # replaced below
+    def field(self, name, model='res.partner'):
+        """An ir.model.fields record, by name.
 
-        def field(name, model='res.partner'):
-            return cls.env['ir.model.fields']._get(model, name)
-        cls.field = staticmethod(field)
+        A plain method rather than a closure stashed on the class: assigning a
+        function to a class attribute binds it as a method on access, and
+        wrapping it in staticmethod() only became callable in python 3.10 -
+        which 14.0, on 3.8, is not.
+        """
+        return self.env['ir.model.fields']._get(model, name)
 
-        cls.config = cls.env['sl.mass.editing'].create({
+    def setUp(self):
+        # Instance level so the field helper is an ordinary method, which
+        # works the same on every version.
+        super().setUp()
+        self.partner_model = self.env['ir.model']._get('res.partner')
+
+
+        self.config = self.env['sl.mass.editing'].create({
             'name': 'Partner bulk edit',
-            'model_id': cls.partner_model.id,
+            'model_id': self.partner_model.id,
             'field_ids': [(6, 0, [
-                field('comment').id, field('function').id, field('city').id,
-                field('category_id').id, field('user_id').id,
-                field('active').id, field('type').id,
+                self.field('comment').id, self.field('function').id, self.field('city').id,
+                self.field('category_id').id, self.field('user_id').id,
+                self.field('active').id, self.field('type').id,
             ])],
         })
-        cls.partners = cls.env['res.partner'].create([
+        self.partners = self.env['res.partner'].create([
             {'name': 'Bulk One', 'city': 'Algiers'},
             {'name': 'Bulk Two', 'city': 'Oran'},
         ])
-        cls.tag_a = cls.env['res.partner.category'].create({'name': 'Tag A'})
-        cls.tag_b = cls.env['res.partner.category'].create({'name': 'Tag B'})
+        self.tag_a = self.env['res.partner.category'].create({'name': 'Tag A'})
+        self.tag_b = self.env['res.partner.category'].create({'name': 'Tag B'})
 
     def _wizard(self, lines):
         return self.env['sl.mass.editing.wizard'].with_context(

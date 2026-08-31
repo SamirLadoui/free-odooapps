@@ -57,8 +57,13 @@ patch(PosStore.prototype, {
                 // sale. Skip it rather than failing the whole return.
                 continue;
             }
+            // 19.0 builds the line from the template - it reads taxes off it
+            // and picks the variant itself - so the template has to be given.
+            // The variant is passed as well so a product with several of them
+            // comes back as the one that was actually sold.
             await this.addLineToCurrentOrder(
                 {
+                    product_tmpl_id: product.product_tmpl_id,
                     product_id: product,
                     qty: -line.qty_returnable,
                     price_unit: line.price_unit,
@@ -67,7 +72,10 @@ patch(PosStore.prototype, {
                 {}
             );
         }
-        order.sl_return_of_order_id = payload.order_id;
+        // An integer, not the relation: a many2one to pos.order shipped to
+        // the client makes it build a half-made order and crash. The server
+        // turns this back into the link.
+        order.sl_return_of_order_ref = payload.order_id;
         if (payload.partner_id && !order.getPartner()) {
             const partner = this.models["res.partner"].get(payload.partner_id);
             if (partner) {

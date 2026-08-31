@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_student_list" model="ir.ui.view">
+        <field name="name">sl.student.list</field>
+        <field name="model">sl.student</field>
+        <field name="arch" type="xml">
+            <list string="Students" decoration-muted="state in ('alumni', 'left')">
+                <field name="roll_number"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="standard_id"/>
+                <field name="academic_year_id" optional="hide"/>
+                <field name="guardian_name" optional="show"/>
+                <field name="phone" optional="show"/>
+                <field name="age" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'enrolled'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_student_kanban" model="ir.ui.view">
+        <field name="name">sl.student.kanban</field>
+        <field name="model">sl.student</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="image"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex">
+                            <img t-att-src="kanban_image('sl.student', 'image', record.id.raw_value)"
+                                 class="o_image_64_cover me-2" alt="Student"/>
+                            <div class="flex-grow-1">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted"><field name="code"/></div>
+                                <div><field name="standard_id"/></div>
+                                <field name="state" widget="label_selection"
+                                       options="{'classes': {'draft': 'info', 'enrolled': 'success', 'alumni': 'default', 'left': 'danger'}}"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_student_form" model="ir.ui.view">
+        <field name="name">sl.student.form</field>
+        <field name="model">sl.student</field>
+        <field name="arch" type="xml">
+            <form string="Student">
+                <header>
+                    <button name="action_enrol" type="object" string="Enrol"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_set_alumni" type="object" string="Mark as Alumni"
+                            invisible="state != 'enrolled'"/>
+                    <button name="action_set_left" type="object" string="Mark as Left"
+                            invisible="state not in ('draft', 'enrolled')"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Application"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,enrolled,alumni"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Full name"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Class">
+                            <field name="standard_id"/>
+                            <field name="academic_year_id" readonly="1"/>
+                            <field name="roll_number"/>
+                            <field name="admission_date"/>
+                        </group>
+                        <group string="Personal">
+                            <field name="birth_date"/>
+                            <field name="age" readonly="1"/>
+                            <field name="gender"/>
+                            <field name="blood_group"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contact" name="contact">
+                            <group>
+                                <group>
+                                    <field name="email" widget="email"/>
+                                    <field name="phone" widget="phone"/>
+                                    <field name="partner_id" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="street"/>
+                                    <field name="city"/>
+                                    <field name="zip"/>
+                                    <field name="country_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Guardian" name="guardian">
+                            <group>
+                                <field name="guardian_name"/>
+                                <field name="guardian_relation"/>
+                                <field name="guardian_phone" widget="phone"/>
+                                <field name="guardian_email" widget="email"/>
+                            </group>
+                        </page>
+                        <page string="Electives" name="electives">
+                            <field name="elective_subject_ids" widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_student_search" model="ir.ui.view">
+        <field name="name">sl.student.search</field>
+        <field name="model">sl.student</field>
+        <field name="arch" type="xml">
+            <search string="Students">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="standard_id"/>
+                <field name="guardian_name"/>
+                <filter name="filter_enrolled" string="Enrolled"
+                        domain="[('state', '=', 'enrolled')]"/>
+                <filter name="filter_applications" string="Applications"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_alumni" string="Alumni"
+                        domain="[('state', '=', 'alumni')]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_standard" string="Class"
+                            context="{'group_by': 'standard_id'}"/>
+                    <filter name="group_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_student" model="ir.actions.act_window">
+        <field name="name">Students</field>
+        <field name="res_model">sl.student</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first student</p>
+            <p>
+                Students start as applications. Enrolling one assigns them to a class,
+                checks the class still has room, and creates a contact record.
+            </p>
+        </field>
+    </record>
+
+</odoo>

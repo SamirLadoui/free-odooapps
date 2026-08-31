@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <t t-name="sl_pos_return.ReturnButton"
+    <!-- Next to the point of sale's own Refund button, in the More dialog:
+         that is where a cashier already looks for this kind of action, and it
+         is the same place pos_discount puts its Discount button. -->
+    <t t-name="sl_pos_return.ControlButtons"
        t-inherit="point_of_sale.ControlButtons" t-inherit-mode="extension">
-        <xpath expr="//SelectPartnerButton" position="before">
+        <xpath expr="//button[hasclass('o_pricelist_button')]" position="before">
             <button t-if="pos.config.sl_allow_returns"
-                    class="btn btn-light btn-lg lh-lg o-so-tabular-nums"
+                    class="o_sl_return_button"
+                    t-att-class="buttonClass"
                     t-on-click="() => this.slReturn()">
                 <i class="fa fa-undo me-1" role="img" aria-label="Return"
                    title="Return"/>

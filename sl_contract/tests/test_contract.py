@@ -19,8 +19,15 @@ class TestContract(TransactionCase):
             cls.journal = cls.env['account.journal'].create({
                 'name': 'Contract Sales', 'code': 'CSAL',
                 'type': 'sale', 'company_id': cls.company.id})
+        books = cls._ensure_accounting()
+        cls.account = books['income']
+        cls.partner.write({
+            'property_account_receivable_id': books['receivable'].id,
+            'property_account_payable_id': books['payable'].id,
+        })
         cls.product = cls.env['product.product'].create({
-            'name': 'Support Retainer', 'list_price': 100.0, 'type': 'service'})
+            'name': 'Support Retainer', 'list_price': 100.0, 'type': 'service',
+            'property_account_income_id': cls.account.id})
 
     def _contract(self, lines=True, **values):
         contract = self.env['sl.contract'].create(dict({
@@ -238,3 +245,49 @@ class TestContract(TransactionCase):
         self.env['sl.contract']._cron_recurring_invoices()
         self.assertEqual(due.invoice_count, 1)
         self.assertEqual(later.invoice_count, 0)
+
+    @classmethod
+    def _ensure_accounting(cls):
+        """A bare database has no chart of accounts.
+
+        Without one the customer has no receivable account, so the balancing
+        line Odoo adds to the invoice has nowhere to post and the database
+        rejects the whole move. A real database always has this; a test
+        database has to be given it.
+        """
+        accounts = cls.env['account.account']
+        modern = 'account_type' in accounts._fields
+
+        def account_of(kind, name, code):
+            if modern:
+                found = accounts.search([('account_type', '=', kind)], limit=1)
+            else:
+                type_ref = {
+                    'income': 'account.data_account_type_revenue',
+                    'asset_receivable': 'account.data_account_type_receivable',
+                    'liability_payable': 'account.data_account_type_payable',
+                }[kind]
+                found = accounts.search(
+                    [('user_type_id', '=', cls.env.ref(type_ref).id)], limit=1)
+            if found:
+                return found
+            values = {'name': name, 'code': code}
+            if modern:
+                values['account_type'] = kind
+                if kind != 'income':
+                    values['reconcile'] = True
+            else:
+                values['user_type_id'] = cls.env.ref({
+                    'income': 'account.data_account_type_revenue',
+                    'asset_receivable': 'account.data_account_type_receivable',
+                    'liability_payable': 'account.data_account_type_payable',
+                }[kind]).id
+                if kind != 'income':
+                    values['reconcile'] = True
+            return accounts.create(values)
+
+        return {
+            'income': account_of('income', 'Test Income', 'TINC01'),
+            'receivable': account_of('asset_receivable', 'Test Receivable', 'TREC01'),
+            'payable': account_of('liability_payable', 'Test Payable', 'TPAY01'),
+        }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_school" model="ir.module.category">
+            <field name="name">School</field>
+            <field name="description">Manage classes, subjects, teachers and students.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="res_groups_privilege_module_category_school" model="res.groups.privilege">
+            <field name="name">School</field>
+            <field name="category_id" ref="module_category_school"/>
+        </record>
+
+        <record id="group_school_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="privilege_id" ref="res_groups_privilege_module_category_school"/>
+            <field name="comment">See classes, subjects, teachers and students, and edit students.</field>
+        </record>
+
+        <record id="group_school_manager" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="privilege_id" ref="res_groups_privilege_module_category_school"/>
+            <field name="implied_ids" eval="[(4, ref('group_school_user'))]"/>
+            <field name="comment">Full control, including academic years, classes and teachers.</field>
+        </record>
+
+        <record id="base.user_admin" model="res.users">
+            <field name="group_ids" eval="[(4, ref('group_school_manager'))]"/>
+        </record>
+
+    </data>
+</odoo>
