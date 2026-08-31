@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_task_form_timer" model="ir.ui.view">
+        <field name="name">project.task.form.timer</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="action_timer_start" type="object"
+                        string="Start Timer" class="btn-primary"
+                        icon="fa-play" attrs="{'invisible': [('sl_timer_running', '!=', False)]}"/>
+                <button name="action_timer_stop" type="object"
+                        string="Stop and Record" class="btn-primary"
+                        icon="fa-stop" attrs="{'invisible': [('sl_timer_running', '=', False)]}"/>
+                <button name="action_timer_cancel" type="object"
+                        string="Discard Timer" icon="fa-times"
+                       
+                        confirm="Throw away the time recorded since the timer started?" attrs="{'invisible': [('sl_timer_running', '=', False)]}"/>
+                <field name="sl_timer_running" invisible="1"/><!-- drives which timer buttons are shown -->
+            </header>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info d-flex align-items-center gap-2"
+                     role="status" attrs="{'invisible': [('sl_timer_running', '=', False)]}">
+                    <i class="fa fa-clock-o"/>
+                    Timer running since
+                    <field name="sl_timer_start" readonly="1" class="oe_inline"/>
+                    &#8212;
+                    <field name="sl_timer_elapsed" widget="float_time"
+                           readonly="1" class="oe_inline"/>
+                    so far.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_list_timer" model="ir.ui.view">
+        <field name="name">project.task.list.timer</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="arch" type="xml">
+            <tree position="inside">
+                <button name="action_timer_start" type="object" string="Start"
+                        icon="fa-play" class="btn-link" attrs="{'invisible': [('sl_timer_running', '!=', False)]}"/>
+                <button name="action_timer_stop" type="object" string="Stop"
+                        icon="fa-stop" class="btn-link" attrs="{'invisible': [('sl_timer_running', '=', False)]}"/>
+                <field name="sl_timer_running" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives which timer button is shown -->
+            </tree>
+        </field>
+    </record>
+
+</odoo>

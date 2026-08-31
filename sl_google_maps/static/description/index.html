@@ -1,0 +1,112 @@
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h2 class="oe_slogan">Google Maps Integration</h2>
+            <h3 class="oe_slogan">Address Autocomplete, And Your Contacts On A Map</h3>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <p class="oe_mt32">Start typing an address and Google finishes it, coordinates included. Then see any contact, or a whole selection of them, on a real map inside Odoo. And it still does something useful before you have an API key.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Key Features</h3>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Addresses That Type Themselves</h4>
+            <p class="oe_mt8 text-center">Start typing on a contact and Google offers suggestions. Pick one and the street, city, postcode, state, country and coordinates are all filled in. No mistyped postcodes, and no contacts that cannot be found on a map later.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Use It On Your Own Models</h4>
+            <p class="oe_mt8 text-center">The autocomplete is a normal field widget. Put widget=&quot;sl_places_autocomplete&quot; on any Char field in any model and it works there too.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">One Contact On A Map</h4>
+            <p class="oe_mt8 text-center">A Show on Map button on the contact form opens it on a map inside Odoo, with a directions link ready to hand to a driver.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">A Whole Selection At Once</h4>
+            <p class="oe_mt8 text-center">Select contacts in the list and pick Show on Map from the Action menu. You get one interactive map of all of them, with clickable markers that link straight back to each record.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Useful Before You Have A Key</h4>
+            <p class="oe_mt8 text-center">With no API key configured nothing breaks. The address field stays an ordinary input and the map buttons open google.com/maps, which needs no key. Add a key later and the same buttons start embedding maps.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Codes Resolved Properly</h4>
+            <p class="oe_mt8 text-center">Google returns countries and states as ISO codes. Those are matched against your own Odoo country and state records on the server, so a state is never guessed at or created by accident.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Getting Started</h3>
+        <div class="oe_span12">
+            <ol style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Install the module and open Settings &gt; General Settings &gt; Google Maps.</li>
+                <li class="oe_mt8">Paste a browser API key with the Maps JavaScript API and Places API enabled.</li>
+                <li class="oe_mt8">Open any contact and start typing in the street field to see suggestions.</li>
+                <li class="oe_mt8">Select several contacts in the list and use Show on Map in the Action menu.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Good To Know</h3>
+        <div class="oe_span12">
+            <ul style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">A Maps browser key is sent to Google by the visitor&#x27;s browser, so it is public by design. Restrict it by HTTP referrer in the Google console.</li>
+                <li class="oe_mt8">The key is only exposed to internal users, never to portal or public visitors.</li>
+                <li class="oe_mt8">Markers on the multi-contact map need coordinates. Autocompleted addresses get them automatically; contacts entered by hand can be geocoded with Odoo&#x27;s own Geolocalize feature.</li>
+                <li class="oe_mt8">Everything server-side is covered by the module&#x27;s tests. The autocomplete itself talks to Google from the browser, so it needs a real key to try.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <h3>Supported Odoo Versions</h3>
+            <p class="oe_mt16"><strong>16.0 &middot; 17.0 &middot; 18.0 &middot; 19.0</strong></p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Contact Us</h3>
+        <div class="oe_span12 text-center">
+            <p class="oe_mt16">
+                If you have any queries or need support for this module, feel free to contact us.
+            </p>
+            <p class="oe_mt16">
+                <a href="https://www.linkedin.com/in/samir-ladoui" target="_blank" class="oe_social_media">
+                    <i class="fa fa-linkedin-square fa-2x"></i> LinkedIn: samir-ladoui
+                </a>
+                <a href="https://wa.me/+213658127254" target="_blank" class="oe_social_media"
+                    style="margin-left: 20px;">
+                    <i class="fa fa-whatsapp fa-2x"></i> WhatsApp: +213658127254
+                </a>
+            </p>
+            <p class="oe_mt8">
+                Email: <a href="mailto:samir.odoo.apps2325@gmail.com">samir.odoo.apps2325@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>

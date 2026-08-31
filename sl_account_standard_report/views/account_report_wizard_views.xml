@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_report_wizard_form" model="ir.ui.view">
+        <field name="name">sl.account.report.wizard.form</field>
+        <field name="model">sl.account.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Standard Accounting Report">
+                <group>
+                    <field name="report_type" widget="radio"/>
+                </group>
+                <group>
+                    <group string="Period">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="target_move"/>
+                    </group>
+                    <group string="Scope">
+                        <field name="company_id" groups="base.group_multi_company"
+                               options="{'no_create': True}"/>
+                        <field name="display_account"/>
+                    </group>
+                </group>
+                <group string="Filters (leave empty for everything)">
+                    <field name="journal_ids" widget="many2many_tags"
+                           placeholder="All journals"/>
+                    <field name="account_ids" widget="many2many_tags"
+                           placeholder="All accounts"/>
+                    <field name="partner_ids" widget="many2many_tags"
+                           placeholder="All partners"/>
+                </group>
+                <footer>
+                    <button name="action_print_pdf" type="object" string="Print PDF"
+                            class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export Excel"
+                            class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_account_report_wizard" model="ir.actions.act_window">
+        <field name="name">Standard Accounting Reports</field>
+        <field name="res_model">sl.account.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_account_standard_report"
+              name="Standard Reports"
+              parent="account.menu_finance_reports"
+              action="action_account_report_wizard"
+              sequence="90"/>
+
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_school_root" name="School"
+              web_icon="sl_school,static/description/icon.png"
+              sequence="90" groups="group_school_user"/>
+
+    <menuitem id="menu_school_students" name="Students"
+              parent="menu_school_root" action="action_student" sequence="10"/>
+
+    <menuitem id="menu_school_organisation" name="Organisation"
+              parent="menu_school_root" sequence="20"/>
+    <menuitem id="menu_school_standards" name="Classes"
+              parent="menu_school_organisation" action="action_school_standard" sequence="10"/>
+    <menuitem id="menu_school_teachers" name="Teachers"
+              parent="menu_school_organisation" action="action_teacher" sequence="20"/>
+    <menuitem id="menu_school_subjects" name="Subjects"
+              parent="menu_school_organisation" action="action_subject" sequence="30"/>
+
+    <menuitem id="menu_school_configuration" name="Configuration"
+              parent="menu_school_root" sequence="90" groups="group_school_manager"/>
+    <menuitem id="menu_school_academic_years" name="Academic Years"
+              parent="menu_school_configuration" action="action_academic_year" sequence="10"/>
+
+</odoo>

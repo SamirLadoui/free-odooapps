@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_invoice_document_format"
+              inherit_id="account.report_invoice_document"
+              name="Invoice Format">
+
+        <!-- Column headings: relabelled, and hidden where configured. -->
+        <xpath expr="//th[@name='th_description']" position="inside">
+            <t t-set="sl_format" t-value="o.company_id"/>
+        </xpath>
+
+        <xpath expr="//th[@name='th_description']/span" position="replace">
+            <span t-esc="o.company_id._invoice_label('description')">Description</span>
+        </xpath>
+
+        <xpath expr="//th[@name='th_quantity']" position="attributes">
+            <attribute name="t-if">o.company_id.invoice_show_quantity</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_quantity']/span" position="replace">
+            <span t-esc="o.company_id._invoice_label('quantity')">Quantity</span>
+        </xpath>
+        <!-- Before 17.0 the body cells have no name, so each is reached by
+             what it renders. The taxes cell holds a t-esc span with an id
+             rather than a t-field. -->
+        <xpath expr="//span[@t-field='line.quantity']/.." position="attributes">
+            <attribute name="t-if">o.company_id.invoice_show_quantity</attribute>
+        </xpath>
+
+        <xpath expr="//th[@name='th_priceunit']" position="attributes">
+            <attribute name="t-if">o.company_id.invoice_show_price_unit</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_priceunit']/span" position="replace">
+            <span t-esc="o.company_id._invoice_label('price_unit')">Unit Price</span>
+        </xpath>
+        <xpath expr="//span[@t-field='line.price_unit']/.." position="attributes">
+            <attribute name="t-if">o.company_id.invoice_show_price_unit</attribute>
+        </xpath>
+
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
+            <attribute name="t-if">display_taxes and o.company_id.invoice_show_taxes</attribute>
+        </xpath>
+        <xpath expr="//span[@id='line_tax_ids']/.." position="attributes">
+            <attribute name="t-if">display_taxes and o.company_id.invoice_show_taxes</attribute>
+        </xpath>
+
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="name">th_subtotal</attribute>
+        </xpath>
+
+        <!-- Product code and image, in front of the description. -->
+        <xpath expr="//td[@name='account_invoice_line_name']" position="inside">
+            <div t-if="o.company_id.invoice_show_product_image and line.product_id.image_128"
+                 class="mt-1">
+                <img t-att-src="image_data_uri(line.product_id.image_128)"
+                     style="max-height: 48px;" alt=""/>
+            </div>
+        </xpath>
+
+        <!-- A footer note the accountant controls without touching QWeb. -->
+        <xpath expr="//table[@name='invoice_line_table']" position="after">
+            <div t-if="o.company_id.invoice_footer_note"
+                 class="mt-3 text-muted"
+                 style="white-space: pre-line;"
+                 t-esc="o.company_id.invoice_footer_note"/>
+        </xpath>
+
+    </template>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sl.invoice.format</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='main_currency_setting_container']" position="after">
+                <block title="Invoice Layout" name="sl_invoice_format_container">
+                    <setting id="sl_invoice_columns" string="Columns"
+                             help="Which columns appear on the printed invoice.">
+                        <div class="content-group">
+                            <div><field name="invoice_show_quantity"/>
+                                 <label for="invoice_show_quantity"/></div>
+                            <div><field name="invoice_show_price_unit"/>
+                                 <label for="invoice_show_price_unit"/></div>
+                            <div><field name="invoice_show_taxes"/>
+                                 <label for="invoice_show_taxes"/></div>
+                            <div><field name="invoice_show_product_image"/>
+                                 <label for="invoice_show_product_image"/></div>
+                        </div>
+                    </setting>
+                    <setting id="sl_invoice_labels" string="Column Headings"
+                             help="Leave empty to keep Odoo's own wording.">
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label for="invoice_label_description" class="col-lg-5 o_light_label"/>
+                                <field name="invoice_label_description" placeholder="Description"/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="invoice_label_quantity" class="col-lg-5 o_light_label"/>
+                                <field name="invoice_label_quantity" placeholder="Quantity"/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="invoice_label_price_unit" class="col-lg-5 o_light_label"/>
+                                <field name="invoice_label_price_unit" placeholder="Unit Price"/>
+                            </div>
+                        </div>
+                    </setting>
+                    <setting id="sl_invoice_footer" string="Footer Note"
+                             help="Printed under every invoice.">
+                        <field name="invoice_footer_note"
+                               placeholder="Payment within 30 days. Late payment attracts interest."/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

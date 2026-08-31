@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fee_structure_list" model="ir.ui.view">
+        <field name="name">sl.fee.structure.list</field>
+        <field name="model">sl.fee.structure</field>
+        <field name="arch" type="xml">
+            <tree string="Fee Structures">
+                <field name="name"/>
+                <field name="academic_year_id"/>
+                <field name="standard_ids" widget="many2many_tags" optional="show"/>
+                <field name="amount_total" widget="monetary"/>
+                <field name="currency_id" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the monetary widget -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fee_structure_form" model="ir.ui.view">
+        <field name="name">sl.fee.structure.form</field>
+        <field name="model">sl.fee.structure</field>
+        <field name="arch" type="xml">
+            <form string="Fee Structure">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Grade 5 annual fees"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="academic_year_id"/>
+                            <field name="currency_id" invisible="1"/><!-- currency for monetary widgets -->
+                        </group>
+                    </group>
+                    <group string="Applies To (leave empty for the whole year)">
+                        <field name="standard_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Items" name="items">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="amount" widget="monetary"/>
+                                    <field name="note"/>
+                                    <field name="currency_id" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the monetary widget -->
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_total" widget="monetary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fee_structure" model="ir.actions.act_window">
+        <field name="name">Fee Structures</field>
+        <field name="res_model">sl.fee.structure</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_fee_list" model="ir.ui.view">
+        <field name="name">sl.fee.list</field>
+        <field name="model">sl.fee</field>
+        <field name="arch" type="xml">
+            <tree string="Fees" decoration-danger="is_overdue"
+                  decoration-success="state == 'paid'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="code"/>
+                <field name="student_id"/>
+                <field name="standard_id" optional="show"/>
+                <field name="structure_id"/>
+                <field name="date_due"/>
+                <field name="amount" widget="monetary"/>
+                <field name="currency_id" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the monetary widget -->
+                <field name="is_overdue" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the row highlight -->
+                <field name="state" widget="badge"
+                       decoration-success="state == 'paid'"
+                       decoration-info="state == 'invoiced'"/>
+                <button name="action_create_invoice" type="object" string="Invoice"
+                        icon="fa-file-text-o" class="btn-link" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fee_form" model="ir.ui.view">
+        <field name="name">sl.fee.form</field>
+        <field name="model">sl.fee</field>
+        <field name="arch" type="xml">
+            <form string="Fee">
+                <header>
+                    <button name="action_create_invoice" type="object"
+                            string="Create Invoice" class="btn-primary" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_mark_paid" type="object" string="Mark Paid" attrs="{'invisible': [('state', 'not in', ['draft', 'invoiced'])]}"/>
+                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ['paid', 'cancelled'])]}"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reset to Draft" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,invoiced,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="code" readonly="1"/></h1>
+                    </div>
+                    <div class="alert alert-danger" role="alert" attrs="{'invisible': [('is_overdue', '=', False)]}">
+                        This fee is past its due date.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="student_id"/>
+                            <field name="standard_id" readonly="1"/>
+                            <field name="academic_year_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="structure_id"/>
+                            <field name="amount" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/><!-- currency for the monetary widget -->
+                            <field name="date_due"/>
+                            <field name="invoice_id" readonly="1"/>
+                            <field name="is_overdue" invisible="1"/><!-- drives the overdue banner above -->
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fee_search" model="ir.ui.view">
+        <field name="name">sl.fee.search</field>
+        <field name="model">sl.fee</field>
+        <field name="arch" type="xml">
+            <search string="Fees">
+                <field name="code"/>
+                <field name="student_id"/>
+                <field name="structure_id"/>
+                <filter name="filter_overdue" string="Overdue"
+                        domain="[('is_overdue', '=', True)]"/>
+                <filter name="filter_unpaid" string="Unpaid"
+                        domain="[('state', 'in', ['draft', 'invoiced'])]"/>
+                <filter name="filter_paid" string="Paid"
+                        domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_standard" string="Class"
+                            context="{'group_by': 'standard_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fee" model="ir.actions.act_window">
+        <field name="name">Fees</field>
+        <field name="res_model">sl.fee</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_unpaid': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Charge your first fee</p>
+            <p>Pick a student and a fee structure; the amount fills in and you can
+               raise an invoice against their contact record.</p>
+        </field>
+    </record>
+
+    <record id="view_student_form_fees" model="ir.ui.view">
+        <field name="name">sl.student.form.fees</field>
+        <field name="model">sl.student</field>
+        <field name="inherit_id" ref="sl_school.view_student_form"/>
+        <field name="arch" type="xml">
+            <page name="electives" position="after">
+                <page string="Fees" name="fees">
+                    <group>
+                        <field name="fee_total" widget="monetary"
+                               options="{'currency_field': 'fee_currency_id'}" readonly="1"/>
+                        <field name="fee_outstanding" widget="monetary"
+                               options="{'currency_field': 'fee_currency_id'}" readonly="1"/>
+                        <field name="fee_currency_id" invisible="1"/><!-- currency for the monetary widgets -->
+                    </group>
+                    <field name="fee_ids" readonly="1">
+                        <tree decoration-danger="is_overdue" decoration-success="state == 'paid'">
+                            <field name="code"/>
+                            <field name="structure_id"/>
+                            <field name="date_due"/>
+                            <field name="amount"/>
+                            <field name="state" widget="badge"/>
+                            <field name="is_overdue" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the row highlight -->
+                        </tree>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <menuitem id="menu_fee" name="Fees"
+              parent="sl_school.menu_school_root" action="action_fee" sequence="17"/>
+    <menuitem id="menu_fee_structure" name="Fee Structures"
+              parent="sl_school.menu_school_configuration"
+              action="action_fee_structure" sequence="20"/>
+
+</odoo>

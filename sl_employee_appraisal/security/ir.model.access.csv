@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_appraisal_category_user,sl.appraisal.category.user,model_sl_appraisal_category,hr.group_hr_user,1,0,0,0
+access_appraisal_category_manager,sl.appraisal.category.manager,model_sl_appraisal_category,hr.group_hr_manager,1,1,1,1
+access_appraisal_criteria_user,sl.appraisal.criteria.user,model_sl_appraisal_criteria,hr.group_hr_user,1,0,0,0
+access_appraisal_criteria_manager,sl.appraisal.criteria.manager,model_sl_appraisal_criteria,hr.group_hr_manager,1,1,1,1
+access_appraisal_user,sl.appraisal.user,model_sl_appraisal,hr.group_hr_user,1,1,1,0
+access_appraisal_manager,sl.appraisal.manager,model_sl_appraisal,hr.group_hr_manager,1,1,1,1
+access_appraisal_line_user,sl.appraisal.line.user,model_sl_appraisal_line,hr.group_hr_user,1,1,1,1
+access_appraisal_line_manager,sl.appraisal.line.manager,model_sl_appraisal_line,hr.group_hr_manager,1,1,1,1

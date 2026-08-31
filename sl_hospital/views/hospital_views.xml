@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Departments -->
+    <record id="view_department_list" model="ir.ui.view">
+        <field name="name">sl.hospital.department.list</field>
+        <field name="model">sl.hospital.department</field>
+        <field name="arch" type="xml">
+            <tree string="Departments" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="head_doctor_id"/>
+                <field name="doctor_count" string="Doctors"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">sl.hospital.department</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Doctors -->
+    <record id="view_doctor_list" model="ir.ui.view">
+        <field name="name">sl.hospital.doctor.list</field>
+        <field name="model">sl.hospital.doctor</field>
+        <field name="arch" type="xml">
+            <tree string="Doctors">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="specialisation"/>
+                <field name="phone" optional="show"/>
+                <field name="email" optional="show"/>
+                <field name="consultation_fee" optional="show"/>
+                <field name="currency_id" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the monetary widget on the fee -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_doctor_form" model="ir.ui.view">
+        <field name="name">sl.hospital.doctor.form</field>
+        <field name="model">sl.hospital.doctor</field>
+        <field name="arch" type="xml">
+            <form string="Doctor">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_appointments" type="object"
+                                class="oe_stat_button" icon="fa-calendar">
+                            <field name="appointment_count" widget="statinfo"
+                                   string="Appointments"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Full name"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Practice">
+                            <field name="department_id"/>
+                            <field name="specialisation"/>
+                            <field name="qualification"/>
+                            <field name="licence_number"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="user_id"/>
+                            <field name="consultation_fee" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/><!-- currency for the monetary widget above -->
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_doctor" model="ir.actions.act_window">
+        <field name="name">Doctors</field>
+        <field name="res_model">sl.hospital.doctor</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Patients -->
+    <record id="view_patient_list" model="ir.ui.view">
+        <field name="name">sl.hospital.patient.list</field>
+        <field name="model">sl.hospital.patient</field>
+        <field name="arch" type="xml">
+            <tree string="Patients">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="gender" optional="show"/>
+                <field name="blood_group" optional="show"/>
+                <field name="phone"/>
+                <field name="appointment_count" string="Visits" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_patient_form" model="ir.ui.view">
+        <field name="name">sl.hospital.patient.form</field>
+        <field name="model">sl.hospital.patient</field>
+        <field name="arch" type="xml">
+            <form string="Patient">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_appointments" type="object"
+                                class="oe_stat_button" icon="fa-calendar">
+                            <field name="appointment_count" widget="statinfo"
+                                   string="Appointments"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Full name"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Personal">
+                            <field name="birth_date"/>
+                            <field name="age" readonly="1"/>
+                            <field name="gender"/>
+                            <field name="blood_group"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="partner_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Address" name="address">
+                            <group>
+                                <field name="street"/>
+                                <field name="city"/>
+                                <field name="zip"/>
+                                <field name="country_id"/>
+                            </group>
+                        </page>
+                        <page string="Emergency Contact" name="emergency">
+                            <group>
+                                <field name="emergency_contact_name"/>
+                                <field name="emergency_contact_phone" widget="phone"/>
+                            </group>
+                        </page>
+                        <page string="Medical" name="medical">
+                            <group>
+                                <field name="allergies"
+                                       placeholder="Shown on every appointment for this patient"/>
+                                <field name="medical_history"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_patient_search" model="ir.ui.view">
+        <field name="name">sl.hospital.patient.search</field>
+        <field name="model">sl.hospital.patient</field>
+        <field name="arch" type="xml">
+            <search string="Patients">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="phone"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_gender" string="Gender"
+                            context="{'group_by': 'gender'}"/>
+                    <filter name="group_blood" string="Blood Group"
+                            context="{'group_by': 'blood_group'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">sl.hospital.patient</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first patient</p>
+            <p>Each patient gets a number and a linked contact, so they can be billed or emailed.</p>
+        </field>
+    </record>
+
+</odoo>

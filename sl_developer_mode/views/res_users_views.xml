@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_developer_mode" model="ir.ui.view">
+        <field name="name">res.users.form.developer.mode</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='references']" position="inside">
+                <group string="Developer Mode" name="sl_developer_mode">
+                    <field name="auto_developer_mode"
+                           groups="base.group_system"/>
+                    <div class="text-muted" colspan="2">
+                        Only Settings administrators can be put into developer
+                        mode automatically.
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

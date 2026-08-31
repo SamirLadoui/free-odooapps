@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_school_standard_list" model="ir.ui.view">
+        <field name="name">sl.school.standard.list</field>
+        <field name="model">sl.school.standard</field>
+        <field name="arch" type="xml">
+            <tree string="Classes" decoration-warning="capacity and seats_left &lt;= 0">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="division"/>
+                <field name="academic_year_id"/>
+                <field name="class_teacher_id"/>
+                <field name="student_count"/>
+                <field name="capacity"/>
+                <field name="seats_left"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_school_standard_form" model="ir.ui.view">
+        <field name="name">sl.school.standard.form</field>
+        <field name="model">sl.school.standard</field>
+        <field name="arch" type="xml">
+            <form string="Class">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_students" type="object"
+                                class="oe_stat_button" icon="fa-users">
+                            <field name="student_count" widget="statinfo" string="Students"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Grade 5" class="oe_inline"/>
+                            <span class="oe_inline"> - </span>
+                            <field name="division" placeholder="A" class="oe_inline"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="academic_year_id"/>
+                            <field name="class_teacher_id"/>
+                        </group>
+                        <group>
+                            <field name="capacity"/>
+                            <field name="seats_left"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Subjects" name="subjects">
+                            <field name="subject_ids" widget="many2many_tags"/>
+                        </page>
+                        <page string="Students" name="students">
+                            <field name="student_ids" readonly="1">
+                                <tree>
+                                    <field name="roll_number"/>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="guardian_name"/>
+                                    <field name="phone"/>
+                                    <field name="state" widget="badge"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_school_standard_search" model="ir.ui.view">
+        <field name="name">sl.school.standard.search</field>
+        <field name="model">sl.school.standard</field>
+        <field name="arch" type="xml">
+            <search string="Classes">
+                <field name="name"/>
+                <field name="division"/>
+                <field name="class_teacher_id"/>
+                <field name="academic_year_id"/>
+                <filter name="filter_full" string="Full"
+                        domain="[('capacity', '&gt;', 0), ('seats_left', '&lt;=', 0)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_teacher" string="Class Teacher"
+                            context="{'group_by': 'class_teacher_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_school_standard" model="ir.actions.act_window">
+        <field name="name">Classes</field>
+        <field name="res_model">sl.school.standard</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

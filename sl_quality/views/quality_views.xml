@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_nonconformity_list" model="ir.ui.view">
+        <field name="name">sl.quality.nonconformity.list</field>
+        <field name="model">sl.quality.nonconformity</field>
+        <field name="arch" type="xml">
+            <tree string="Non-Conformities"
+                  decoration-danger="severity == 'critical' and state != 'closed'"
+                  decoration-muted="state in ('closed', 'cancelled')">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="origin"/>
+                <field name="severity" widget="badge"
+                       decoration-danger="severity == 'critical'"
+                       decoration-warning="severity == 'major'"/>
+                <field name="partner_id" optional="show"/>
+                <field name="responsible_id"/>
+                <field name="date_reported"/>
+                <field name="open_action_count" string="Open Actions"/>
+                <field name="overdue_action_count" string="Overdue" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'closed'"
+                       decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_nonconformity_form" model="ir.ui.view">
+        <field name="name">sl.quality.nonconformity.form</field>
+        <field name="model">sl.quality.nonconformity</field>
+        <field name="arch" type="xml">
+            <form string="Non-Conformity">
+                <header>
+                    <button name="action_start_analysis" type="object"
+                            string="Start Analysis" class="btn-primary" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_start_actions" type="object"
+                            string="Raise Actions" class="btn-primary" attrs="{'invisible': [('state', '!=', 'analysis')]}"/>
+                    <button name="action_close" type="object" string="Close"
+                            class="btn-primary"
+                            groups="sl_quality.group_quality_manager" attrs="{'invisible': [('state', '!=', 'action')]}"/>
+                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ['closed', 'cancelled'])]}"/>
+                    <button name="action_reset_to_draft" type="object"
+                            string="Reopen"
+                            groups="sl_quality.group_quality_manager" attrs="{'invisible': [('state', 'not in', ['closed', 'cancelled'])]}"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,analysis,action,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_actions" type="object"
+                                class="oe_stat_button" icon="fa-tasks">
+                            <field name="action_count" widget="statinfo" string="Actions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Wrong labels on batch 42"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="origin"/>
+                            <field name="severity"/>
+                            <field name="partner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="People And Dates">
+                            <field name="reported_by_id"/>
+                            <field name="responsible_id"/>
+                            <field name="date_reported"/>
+                            <field name="date_closed" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" attrs="{'invisible': [('overdue_action_count', '=', False)]}">
+                        <field name="overdue_action_count" class="oe_inline" readonly="1"/>
+                        action(s) are past their deadline.
+                    </div>
+                    <notebook>
+                        <page string="What Happened" name="description">
+                            <group>
+                                <field name="description" nolabel="1"
+                                       placeholder="Describe the non-conformity"/>
+                            </group>
+                        </page>
+                        <page string="Analysis" name="analysis">
+                            <group>
+                                <field name="immediate_action"
+                                       placeholder="What was done straight away to limit the damage"/>
+                                <field name="root_cause"
+                                       placeholder="Why it happened. Required before closing."/>
+                            </group>
+                        </page>
+                        <page string="Actions" name="actions">
+                            <field name="action_ids">
+                                <tree editable="bottom"
+                                      decoration-danger="is_overdue"
+                                      decoration-muted="state == 'cancelled'">
+                                    <field name="name"/>
+                                    <field name="action_type"/>
+                                    <field name="responsible_id"/>
+                                    <field name="deadline"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'done'"/>
+                                    <field name="is_overdue" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the row highlight -->
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nonconformity_search" model="ir.ui.view">
+        <field name="name">sl.quality.nonconformity.search</field>
+        <field name="model">sl.quality.nonconformity</field>
+        <field name="arch" type="xml">
+            <search string="Non-Conformities">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="responsible_id"/>
+                <filter name="filter_open" string="Open"
+                        domain="[('state', 'not in', ['closed', 'cancelled'])]"/>
+                <!-- Searched through the actions: the count on this model is
+                     computed and not stored, so it cannot appear in a domain. -->
+                <filter name="filter_overdue" string="Has Overdue Actions"
+                        domain="[('action_ids.is_overdue', '=', True)]"/>
+                <filter name="filter_critical" string="Critical"
+                        domain="[('severity', '=', 'critical')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_severity" string="Severity"
+                            context="{'group_by': 'severity'}"/>
+                    <filter name="group_origin" string="Origin"
+                            context="{'group_by': 'origin'}"/>
+                    <filter name="group_responsible" string="Responsible"
+                            context="{'group_by': 'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nonconformity" model="ir.actions.act_window">
+        <field name="name">Non-Conformities</field>
+        <field name="res_model">sl.quality.nonconformity</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Record your first non-conformity</p>
+            <p>
+                Something went wrong: write it down, find the cause, raise the
+                actions, and close it only when they are all done.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_quality_action_list" model="ir.ui.view">
+        <field name="name">sl.quality.action.list</field>
+        <field name="model">sl.quality.action</field>
+        <field name="arch" type="xml">
+            <tree string="Actions" decoration-danger="is_overdue"
+                  decoration-muted="state == 'cancelled'">
+                <field name="nonconformity_id"/>
+                <field name="name"/>
+                <field name="action_type"/>
+                <field name="responsible_id"/>
+                <field name="deadline"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"/>
+                <field name="is_overdue" attrs="{'column_invisible': [(1, '=', 1)]}"/><!-- drives the row highlight -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_quality_action_form" model="ir.ui.view">
+        <field name="name">sl.quality.action.form</field>
+        <field name="model">sl.quality.action</field>
+        <field name="arch" type="xml">
+            <form string="Action">
+                <header>
+                    <button name="action_done" type="object" string="Mark Done"
+                            class="btn-primary" attrs="{'invisible': [('state', '!=', 'open')]}"/>
+                    <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': [('state', '!=', 'open')]}"/>
+                    <button name="action_reopen" type="object" string="Reopen" attrs="{'invisible': [('state', '=', 'open')]}"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Retrain the labelling team"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="nonconformity_id"/>
+                            <field name="action_type"/>
+                        </group>
+                        <group>
+                            <field name="responsible_id"/>
+                            <field name="deadline"/>
+                            <field name="date_done" readonly="1"/>
+                            <field name="is_overdue" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_quality_action" model="ir.actions.act_window">
+        <field name="name">Actions</field>
+        <field name="res_model">sl.quality.action</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_quality_root" name="Quality"
+              web_icon="sl_quality,static/description/icon.png"
+              sequence="92" groups="group_quality_user"/>
+    <menuitem id="menu_nonconformity" name="Non-Conformities"
+              parent="menu_quality_root" action="action_nonconformity" sequence="10"/>
+    <menuitem id="menu_quality_action" name="Actions"
+              parent="menu_quality_root" action="action_quality_action" sequence="20"/>
+
+</odoo>
