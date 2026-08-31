@@ -28,7 +28,7 @@ Departments, doctors, patients and appointments, built around a booking rule tha
 
 ## Supported Versions
 
-`17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

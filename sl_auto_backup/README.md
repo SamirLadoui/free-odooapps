@@ -29,7 +29,7 @@ Set up unattended backups of any database on your Odoo server, keep the backup d
 
 ## Supported Versions
 
-`17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

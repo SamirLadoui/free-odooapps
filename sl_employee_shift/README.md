@@ -28,7 +28,7 @@ Define your shifts once, assign people to them over time, and see who is on whic
 
 ## Supported Versions
 
-`19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

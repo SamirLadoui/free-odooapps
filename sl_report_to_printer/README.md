@@ -29,7 +29,7 @@ Send Odoo reports straight to a CUPS printer instead of downloading a PDF and op
 
 ## Supported Versions
 
-`17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

@@ -28,7 +28,7 @@ Tick a sale order line as a rental, give it a hire date and a return date, and i
 
 ## Supported Versions
 
-`17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

@@ -29,7 +29,7 @@ The core record-keeping a school runs on: who is in which class, who teaches wha
 
 ## Supported Versions
 
-`18.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

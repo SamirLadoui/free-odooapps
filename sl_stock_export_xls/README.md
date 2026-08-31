@@ -27,7 +27,7 @@ A single wizard that turns your inventory into a spreadsheet you can actually wo
 
 ## Supported Versions
 
-`19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

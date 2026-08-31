@@ -27,7 +27,7 @@ A customer comes back with a receipt and two of the four things they bought. The
 
 ## Supported Versions
 
-`16.0` `17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

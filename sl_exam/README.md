@@ -28,7 +28,7 @@ Exams with mark sheets, letter grades and pass rates that work themselves out. B
 
 ## Supported Versions
 
-`18.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 
