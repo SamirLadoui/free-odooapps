@@ -24,7 +24,7 @@ Odoo caps the width of a form sheet. On a wide monitor, and on forms with many c
 
 ## Supported Versions
 
-`17.0` `18.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 

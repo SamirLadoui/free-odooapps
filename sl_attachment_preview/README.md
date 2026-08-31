@@ -27,7 +27,7 @@ Adds a Preview button to every attachment in Odoo. Images, PDFs, text files, vid
 
 ## Supported Versions
 
-`16.0` `17.0` `19.0`
+`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
 
 ## License
 
