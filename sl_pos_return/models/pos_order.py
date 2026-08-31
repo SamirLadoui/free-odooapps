@@ -15,6 +15,17 @@ class PosOrder(models.Model):
         help='The order these lines are being returned from.')
     sl_return_ids = fields.One2many(
         'pos.order', 'sl_return_of_order_id', string='Returns')
+    sl_return_of_order_ref = fields.Integer(
+        string='Return Of (reference)', copy=False,
+        help='The id the till sends back, resolved into the link on the '
+             'server. An integer rather than the relation itself, so the '
+             'browser never tries to build the order it points at.')
+
+    # No _load_pos_data_fields override on purpose. The point of sale reads
+    # pos.order with an empty field list, which means every field - so the
+    # fields above already reach the till. Returning a list here would narrow
+    # that read instead of widening it, and an order that arrives without its
+    # lines crashes the client while it works out prices.
     sl_has_returns = fields.Boolean(compute='_compute_sl_has_returns')
 
     @api.depends('sl_return_ids')
@@ -38,21 +49,23 @@ class PosOrder(models.Model):
     # -- getting the link back from the till ------------------------------
 
     @api.model
-    def _load_pos_data_fields(self, *args):
-        """Ship the link to the client so a return can carry it back.
-
-        Takes *args because the argument changed shape between versions: 18.0
-        passes a config id, 19.0 passes the config record.
-        """
-        return super()._load_pos_data_fields(*args) + ['sl_return_of_order_id']
-
-    @api.model
     def _order_fields(self, ui_order):
         """The pre-18 route for the same value."""
         values = super()._order_fields(ui_order)
-        if ui_order.get('sl_return_of_order_id'):
-            values['sl_return_of_order_id'] = ui_order['sl_return_of_order_id']
+        reference = ui_order.get('sl_return_of_order_ref') \
+            or ui_order.get('sl_return_of_order_id')
+        if reference:
+            values['sl_return_of_order_id'] = reference
         return values
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Turn what the till sent back into the link itself."""
+        for values in vals_list:
+            reference = values.get('sl_return_of_order_ref')
+            if reference and not values.get('sl_return_of_order_id'):
+                values['sl_return_of_order_id'] = reference
+        return super().create(vals_list)
 
     # -- finding the order to return --------------------------------------
 

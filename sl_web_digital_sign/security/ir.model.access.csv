@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_signature_config_admin,sl.signature.config.admin,model_sl_signature_config,base.group_system,1,1,1,1
+access_signature_config_user,sl.signature.config.user,model_sl_signature_config,base.group_user,1,0,0,0
+access_signature_user,sl.signature.user,model_sl_signature,base.group_user,1,0,1,0
+access_signature_admin,sl.signature.admin,model_sl_signature,base.group_system,1,1,1,1
+access_signature_wizard,sl.signature.wizard,model_sl_signature_wizard,base.group_user,1,1,1,1

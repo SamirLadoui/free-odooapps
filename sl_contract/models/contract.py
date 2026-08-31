@@ -329,7 +329,37 @@ class ContractLine(models.Model):
             values['product_id'] = self.product_id.id
         if self.uom_id:
             values['product_uom_id'] = self.uom_id.id
+
+        account = self._invoice_line_account()
+        if not account:
+            raise UserError(_(
+                "No income account for %(product)s, so an invoice line cannot "
+                "be created. Set one on the product or its category.")
+                % {'product': self.product_id.display_name or self.name})
+        values['account_id'] = account.id
         return values
+
+    def _invoice_line_account(self):
+        """The income account for this line.
+
+        Newer versions fill this in from the product when the line is built
+        through the invoice's own onchanges. Creating the line directly - which
+        is what a scheduled run does - leaves it empty, and the database
+        refuses an accountable line without an account.
+        """
+        self.ensure_one()
+        company = self.contract_id.company_id or self.env.company
+        product = self.product_id.with_company(company) \
+            if self.product_id and hasattr(self.product_id, 'with_company') \
+            else self.product_id
+        if product:
+            account = product.property_account_income_id \
+                or product.categ_id.property_account_income_categ_id
+            if account:
+                return account
+        journal = self.contract_id.journal_id
+        return journal.default_account_id if 'default_account_id' in journal._fields \
+            else self.env['account.account'].browse()
 
 
 class AccountMove(models.Model):
