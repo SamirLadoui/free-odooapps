@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_biometric_device_list" model="ir.ui.view">
+        <field name="name">sl.biometric.device.list</field>
+        <field name="model">sl.biometric.device</field>
+        <field name="arch" type="xml">
+            <tree string="Biometric Devices" decoration-danger="last_state == 'fail'">
+                <field name="name"/>
+                <field name="address"/>
+                <field name="port"/>
+                <field name="last_download"/>
+                <field name="last_state" widget="badge"
+                       decoration-success="last_state == 'ok'"
+                       decoration-danger="last_state == 'fail'"/>
+                <button name="action_download" type="object" string="Download"
+                        icon="fa-download" class="btn-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_biometric_device_form" model="ir.ui.view">
+        <field name="name">sl.biometric.device.form</field>
+        <field name="model">sl.biometric.device</field>
+        <field name="arch" type="xml">
+            <form string="Biometric Device">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection"/>
+                    <button name="action_download" type="object"
+                            string="Download Attendance" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Main Entrance"/></h1>
+                    </div>
+                    <group>
+                        <group string="Connection">
+                            <field name="address"/>
+                            <field name="port"/>
+                            <field name="password" password="True"/>
+                            <field name="timeout"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Behaviour">
+                            <field name="debounce_seconds"/>
+                            <field name="last_download" readonly="1"/>
+                            <field name="last_state" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Last Result" attrs="{'invisible': [('last_message', '=', False)]}">
+                        <field name="last_message" nolabel="1" readonly="1"/>
+                    </group>
+                    <div class="alert alert-info" role="status">
+                        Needs the <code>pyzk</code> package on the Odoo server:
+                        <code>pip install pyzk</code>. Each employee must carry the
+                        <b>Biometric ID</b> they are enrolled under on the device,
+                        on their HR Settings tab.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_biometric_device" model="ir.actions.act_window">
+        <field name="name">Biometric Devices</field>
+        <field name="res_model">sl.biometric.device</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first device</p>
+            <p>
+                Odoo connects to the device over the network, downloads the punches
+                and turns them into attendance records.
+            </p>
+        </field>
+    </record>
+
+    <record id="view_employee_form_biometric" model="ir.ui.view">
+        <field name="name">hr.employee.form.biometric</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <field name="job_title" position="after">
+                <field name="sl_device_user_id"/>
+            </field>
+        </field>
+    </record>
+
+    <menuitem id="menu_biometric_device" name="Biometric Devices"
+              parent="hr.hr_menu_configuration" action="action_biometric_device"
+              sequence="48" groups="hr.group_hr_manager"/>
+
+</odoo>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- One node and everyone beneath it. Recursive: t-call on itself. -->
+    <template id="chart_node" name="Org Chart Node">
+        <li>
+            <div t-attf-class="sl_org_card #{'sl_org_cycle' if node.get('cycle') else ''}">
+                <img class="sl_org_photo"
+                     t-attf-src="/web/image/hr.employee/#{node['id']}/avatar_128"
+                     t-att-alt="node['name']"/>
+                <div class="sl_org_text">
+                    <a class="sl_org_name" t-attf-href="/odoo/hr.employee/#{node['id']}"
+                       target="_blank" t-out="node['name']"/>
+                    <div class="sl_org_job" t-if="node['job_title']" t-out="node['job_title']"/>
+                    <div class="sl_org_dept" t-if="node['department']" t-out="node['department']"/>
+                    <div class="sl_org_count" t-if="node['report_count']">
+                        <t t-out="node['report_count']"/> beneath
+                    </div>
+                    <div class="sl_org_warn" t-if="node.get('cycle')">
+                        Already appears higher up: management cycle
+                    </div>
+                    <div class="sl_org_warn" t-if="node.get('truncated')">
+                        Chart truncated here
+                    </div>
+                </div>
+            </div>
+            <ul t-if="node['children']">
+                <t t-foreach="node['children']" t-as="child">
+                    <t t-set="node" t-value="child"/>
+                    <t t-call="sl_hr_org_chart.chart_node"/>
+                </t>
+            </ul>
+        </li>
+    </template>
+
+    <template id="chart_page" name="Org Chart">
+        <t t-call="web.frontend_layout">
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+
+            <div class="sl_org_page">
+                <div class="sl_org_header">
+                    <h3 t-out="title"/>
+                    <div class="text-muted" t-out="subtitle"/>
+                    <button class="btn btn-secondary btn-sm d-print-none"
+                            onclick="window.print()">Print</button>
+                </div>
+
+                <div class="sl_org_body">
+                    <div t-if="not nodes" class="sl_org_empty">
+                        <h4>Nothing to chart</h4>
+                        <p class="text-muted">
+                            No employees are visible to you, or nobody has a manager set.
+                        </p>
+                    </div>
+                    <ul t-else="" class="sl_org_tree">
+                        <t t-foreach="nodes" t-as="root">
+                            <t t-set="node" t-value="root"/>
+                            <t t-call="sl_hr_org_chart.chart_node"/>
+                        </t>
+                    </ul>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

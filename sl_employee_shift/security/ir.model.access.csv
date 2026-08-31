@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shift_user,sl.shift.user,model_sl_shift,hr.group_hr_user,1,0,0,0
+access_shift_manager,sl.shift.manager,model_sl_shift,hr.group_hr_manager,1,1,1,1
+access_shift_assignment_user,sl.shift.assignment.user,model_sl_shift_assignment,hr.group_hr_user,1,1,1,0
+access_shift_assignment_manager,sl.shift.assignment.manager,model_sl_shift_assignment,hr.group_hr_manager,1,1,1,1

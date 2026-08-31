@@ -70,7 +70,7 @@ class TestModuleRecord(TransactionCase):
         self.env.cr.execute(
             "UPDATE res_partner SET write_date = write_date - interval '1 day' "
             "WHERE id = %s", (earlier.id,))
-        earlier.invalidate_recordset(['write_date'])
+        earlier.invalidate_cache(['write_date'])
 
         recording = self._recording()
         recording.action_start()

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Default Cache Configuration -->
+        <record id="default_cache_config" model="pos.cache.config">
+            <field name="name">Default Hybrid Configuration</field>
+            <field name="cache_strategy">hybrid</field>
+            <field name="cache_size_limit_mb">50</field>
+            <field name="preload_products_count">500</field>
+            <field name="lazy_load_batch_size">100</field>
+            <field name="enable_compression">True</field>
+            <field name="compression_level">6</field>
+            <field name="enable_image_lazy_loading">True</field>
+            <field name="image_quality">medium</field>
+            <field name="cache_expiry_hours">24</field>
+            <field name="auto_refresh_enabled">True</field>
+            <field name="enable_background_sync">True</field>
+            <field name="sync_interval_minutes">5</field>
+            <field name="enable_indexeddb">True</field>
+            <field name="enable_service_worker">False</field>
+            <field name="max_concurrent_requests">5</field>
+            <field name="enable_analytics">True</field>
+            <field name="detailed_logging">False</field>
+            <field name="performance_warning_threshold">1000.0</field>
+            <field name="cache_hit_ratio_target">80.0</field>
+            <field name="active">True</field>
+            <field name="description">Default cache configuration with balanced performance settings suitable for most POS setups with medium to large product catalogs.</field>
+        </record>
+
+        <!-- High Performance Configuration -->
+        <record id="high_performance_cache_config" model="pos.cache.config">
+            <field name="name">High Performance Configuration</field>
+            <field name="cache_strategy">priority</field>
+            <field name="cache_size_limit_mb">100</field>
+            <field name="preload_products_count">1000</field>
+            <field name="lazy_load_batch_size">200</field>
+            <field name="enable_compression">True</field>
+            <field name="compression_level">9</field>
+            <field name="enable_image_lazy_loading">True</field>
+            <field name="image_quality">high</field>
+            <field name="cache_expiry_hours">48</field>
+            <field name="auto_refresh_enabled">True</field>
+            <field name="enable_background_sync">True</field>
+            <field name="sync_interval_minutes">3</field>
+            <field name="enable_indexeddb">True</field>
+            <field name="enable_service_worker">True</field>
+            <field name="max_concurrent_requests">10</field>
+            <field name="enable_analytics">True</field>
+            <field name="detailed_logging">True</field>
+            <field name="performance_warning_threshold">500.0</field>
+            <field name="cache_hit_ratio_target">90.0</field>
+            <field name="active">True</field>
+            <field name="description">High performance configuration for environments with powerful hardware and large product catalogs requiring maximum speed.</field>
+        </record>
+
+        <!-- Mobile/Low Memory Configuration -->
+        <record id="mobile_cache_config" model="pos.cache.config">
+            <field name="name">Mobile/Low Memory Configuration</field>
+            <field name="cache_strategy">lazy</field>
+            <field name="cache_size_limit_mb">20</field>
+            <field name="preload_products_count">200</field>
+            <field name="lazy_load_batch_size">50</field>
+            <field name="enable_compression">True</field>
+            <field name="compression_level">9</field>
+            <field name="enable_image_lazy_loading">True</field>
+            <field name="image_quality">low</field>
+            <field name="cache_expiry_hours">12</field>
+            <field name="auto_refresh_enabled">False</field>
+            <field name="enable_background_sync">False</field>
+            <field name="sync_interval_minutes">10</field>
+            <field name="enable_indexeddb">False</field>
+            <field name="enable_service_worker">False</field>
+            <field name="max_concurrent_requests">3</field>
+            <field name="enable_analytics">True</field>
+            <field name="detailed_logging">False</field>
+            <field name="performance_warning_threshold">2000.0</field>
+            <field name="cache_hit_ratio_target">70.0</field>
+            <field name="active">True</field>
+            <field name="description">Optimized configuration for mobile devices or environments with limited memory and processing power.</field>
+        </record>
+
+        <!-- Cron Job for Analytics Cleanup -->
+        <record id="ir_cron_cleanup_cache_analytics" model="ir.cron">
+            <field name="name">Cleanup Old Cache Analytics</field>
+            <field name="model_id" ref="model_pos_cache_analytics"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">model.cleanup_old_analytics()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- Cron Job for Cache Optimization -->
+        <record id="ir_cron_optimize_cache_priorities" model="ir.cron">
+            <field name="name">Optimize Cache Priorities</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">
+# Auto-optimize cache priorities based on product usage
+products = model.search([('sale_ok', '=', True), ('available_in_pos', '=', True)])
+products.action_optimize_for_cache()
+            </field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- Default System Parameters -->
+        <record id="pos_cache_global_enable_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.global_enable</field>
+            <field name="value">True</field>
+        </record>
+
+        <record id="pos_cache_default_strategy_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.default_strategy</field>
+            <field name="value">hybrid</field>
+        </record>
+
+        <record id="pos_cache_default_size_limit_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.default_size_limit</field>
+            <field name="value">50</field>
+        </record>
+
+        <record id="pos_cache_default_preload_count_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.default_preload_count</field>
+            <field name="value">500</field>
+        </record>
+
+        <record id="pos_cache_compression_enable_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.compression_enable</field>
+            <field name="value">True</field>
+        </record>
+
+        <record id="pos_cache_image_lazy_loading_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.image_lazy_loading</field>
+            <field name="value">True</field>
+        </record>
+
+        <record id="pos_cache_analytics_retention_days_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.analytics_retention_days</field>
+            <field name="value">30</field>
+        </record>
+
+        <record id="pos_cache_background_sync_enable_param" model="ir.config_parameter">
+            <field name="key">pos_cache_optimizer.background_sync_enable</field>
+            <field name="value">True</field>
+        </record>
+
+    </data>
+</odoo>

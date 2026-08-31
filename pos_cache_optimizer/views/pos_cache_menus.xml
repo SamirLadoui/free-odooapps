@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Main Menu for POS Cache Optimizer -->
+        <menuitem id="menu_pos_cache_main" 
+                  name="POS Cache" 
+                  parent="point_of_sale.menu_point_root" 
+                  sequence="50"/>
+
+        <!-- Configuration Menu -->
+        <menuitem id="menu_pos_cache_configuration" 
+                  name="Configuration" 
+                  parent="menu_pos_cache_main" 
+                  sequence="10"/>
+
+        <!-- Cache Configurations -->
+        <menuitem id="menu_pos_cache_config" 
+                  name="Cache Configurations" 
+                  parent="menu_pos_cache_configuration" 
+                  action="action_pos_cache_config" 
+                  sequence="10"/>
+
+        <!-- Analytics Menu -->
+        <menuitem id="menu_pos_cache_analytics_main" 
+                  name="Analytics" 
+                  parent="menu_pos_cache_main" 
+                  sequence="20"/>
+
+        <!-- Cache Analytics -->
+        <menuitem id="menu_pos_cache_analytics" 
+                  name="Cache Analytics" 
+                  parent="menu_pos_cache_analytics_main" 
+                  action="action_pos_cache_analytics" 
+                  sequence="10"/>
+
+        <!-- Performance Dashboard -->
+        <menuitem id="menu_pos_cache_dashboard" 
+                  name="Performance Dashboard" 
+                  parent="menu_pos_cache_analytics_main" 
+                  action="action_pos_cache_analytics_dashboard" 
+                  sequence="20"/>
+
+        <!-- Add shortcut to POS configurations with cache info -->
+        <menuitem id="menu_pos_config_cache" 
+                  name="POS Configurations" 
+                  parent="menu_pos_cache_configuration" 
+                  action="point_of_sale.action_pos_config_kanban" 
+                  sequence="20"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_sl_student" model="ir.sequence">
+            <field name="name">Student Number</field>
+            <field name="code">sl.student</field>
+            <field name="prefix">STU/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_sl_teacher" model="ir.sequence">
+            <field name="name">Staff Number</field>
+            <field name="code">sl.teacher</field>
+            <field name="prefix">TCH/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

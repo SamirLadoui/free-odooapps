@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_printing_server_list" model="ir.ui.view">
+        <field name="name">sl.printing.server.list</field>
+        <field name="model">sl.printing.server</field>
+        <field name="arch" type="xml">
+            <tree string="Print Servers">
+                <field name="name"/>
+                <field name="address"/>
+                <field name="port"/>
+                <field name="printer_count" string="Printers"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_printing_server_form" model="ir.ui.view">
+        <field name="name">sl.printing.server.form</field>
+        <field name="model">sl.printing.server</field>
+        <field name="arch" type="xml">
+            <form string="Print Server">
+                <header>
+                    <button name="action_test_connection" type="object"
+                            string="Test Connection"/>
+                    <button name="action_update_printers" type="object"
+                            string="Update Printers" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
+                    <field name="active" invisible="1"/><!-- drives the Archived ribbon and the archive action -->
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="address"/>
+                            <field name="port"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Printers" name="printers">
+                            <field name="printer_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="system_name"/>
+                                    <field name="model"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'available'"
+                                           decoration-danger="status == 'error'"/>
+                                    <field name="is_default"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <div class="alert alert-info" role="status">
+                        Printing needs the <code>pycups</code> Python package on the
+                        Odoo server: <code>pip install pycups</code>. Odoo talks to
+                        CUPS, so the printer must be a queue the Odoo server can see,
+                        not one attached to the user's own machine.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_printing_server" model="ir.actions.act_window">
+        <field name="name">Print Servers</field>
+        <field name="res_model">sl.printing.server</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_printer_list" model="ir.ui.view">
+        <field name="name">sl.printer.list</field>
+        <field name="model">sl.printer</field>
+        <field name="arch" type="xml">
+            <tree string="Printers" decoration-danger="status == 'error'">
+                <field name="name"/>
+                <field name="system_name"/>
+                <field name="server_id"/>
+                <field name="model" optional="show"/>
+                <field name="location" optional="hide"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'available'"
+                       decoration-danger="status == 'error'"/>
+                <field name="is_default"/>
+                <field name="last_seen" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_printer_form" model="ir.ui.view">
+        <field name="name">sl.printer.form</field>
+        <field name="model">sl.printer</field>
+        <field name="arch" type="xml">
+            <form string="Printer">
+                <header>
+                    <button name="action_print_test_page" type="object"
+                            string="Print Test Page" class="btn-primary"/>
+                    <button name="action_set_default" type="object"
+                            string="Make Default" attrs="{'invisible': [('is_default', '!=', False)]}"/>
+                    <button name="action_update_status" type="object"
+                            string="Refresh Status"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Default" bg_color="text-bg-success" attrs="{'invisible': [('is_default', '=', False)]}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="system_name"/>
+                            <field name="server_id"/>
+                            <field name="is_default"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="status"/>
+                            <field name="status_message"/>
+                            <field name="model"/>
+                            <field name="location"/>
+                            <field name="uri"/>
+                            <field name="last_seen"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_printer" model="ir.actions.act_window">
+        <field name="name">Printers</field>
+        <field name="res_model">sl.printer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No printers yet</p>
+            <p>Add a print server and press <b>Update Printers</b> to pull in its queues.</p>
+        </field>
+    </record>
+
+    <record id="view_report_form_printing" model="ir.ui.view">
+        <field name="name">ir.actions.report.form.printing</field>
+        <field name="model">ir.actions.report</field>
+        <field name="inherit_id" ref="base.act_report_xml_view"/>
+        <field name="arch" type="xml">
+            <field name="report_type" position="after">
+                <field name="printing_action"/>
+                <field name="printing_printer_id" attrs="{'invisible': [('printing_action', '!=', 'server')]}"/>
+                <field name="printing_copies" attrs="{'invisible': [('printing_action', '!=', 'server')]}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_users_form_printing" model="ir.ui.view">
+        <field name="name">res.users.form.printing</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='preferences']" position="inside">
+                <group string="Printing">
+                    <field name="printing_action"/>
+                    <field name="printing_printer_id" attrs="{'invisible': [('printing_action', '!=', 'server')]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_printing_root" name="Printing"
+              parent="base.menu_administration" sequence="64"
+              groups="base.group_system"/>
+    <menuitem id="menu_printer" name="Printers"
+              parent="menu_printing_root" action="action_printer" sequence="10"/>
+    <menuitem id="menu_printing_server" name="Print Servers"
+              parent="menu_printing_root" action="action_printing_server" sequence="20"/>
+
+</odoo>

@@ -25,12 +25,10 @@
                     <button name="action_generate" type="object"
                             string="Generate Key" class="btn-primary"
                             confirm="Generating replaces any existing key for this record. Anything using the old key will stop working. Continue?"/>
-                    <button name="action_revoke" type="object" string="Revoke"
-                            invisible="not active"/>
+                    <button name="action_revoke" type="object" string="Revoke" attrs="{'invisible': [('active', '=', False)]}"/>
                 </header>
                 <sheet>
-                    <widget name="web_ribbon" title="Revoked" bg_color="text-bg-danger"
-                            invisible="active"/>
+                    <widget name="web_ribbon" title="Revoked" bg_color="text-bg-danger" attrs="{'invisible': [('active', '!=', False)]}"/>
                     <field name="active" invisible="1"/><!-- drives the Revoked ribbon -->
                     <div class="oe_title">
                         <label for="name"/>

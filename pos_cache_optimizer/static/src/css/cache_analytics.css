@@ -1,0 +1,437 @@
+/* Cache Analytics Dashboard Styles */
+
+.pos-cache-dashboard-content {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 120px);
+}
+
+/* Global Metrics Cards */
+.pos-cache-global-metrics {
+    margin-bottom: 30px;
+}
+
+.pos-cache-metric-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pos-cache-metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.pos-cache-metric-card.success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.pos-cache-metric-card.warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.pos-cache-metric-card.danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    line-height: 1;
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+/* Charts Section */
+.pos-cache-charts {
+    margin-bottom: 30px;
+}
+
+.pos-cache-charts .card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.pos-cache-charts .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+    color: #495057;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* Configuration Comparison Table */
+.pos-cache-config-comparison {
+    margin-bottom: 30px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.pos-cache-config-comparison .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.pos-cache-config-comparison .table {
+    margin-bottom: 0;
+}
+
+.pos-cache-config-comparison .table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.pos-cache-config-comparison .table td {
+    vertical-align: middle;
+}
+
+/* Recommendations Section */
+.pos-cache-recommendations {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.pos-cache-recommendations .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.recommendation-item {
+    border-left: 4px solid;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.recommendation-item:last-child {
+    margin-bottom: 0;
+}
+
+.recommendation-item h6 {
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.recommendation-item h6 i {
+    margin-right: 8px;
+}
+
+.recommendation-item p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+/* Performance Badges */
+.badge-success {
+    background-color: #28a745;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+}
+
+/* Dashboard Controls */
+.pos-cache-dashboard-controls {
+    background-color: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pos-cache-period-select {
+    min-width: 150px;
+}
+
+.pos-cache-config-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pos-cache-config-filter {
+    padding: 5px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 20px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.pos-cache-config-filter:hover {
+    background-color: #e9ecef;
+}
+
+.pos-cache-config-filter.selected {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pos-cache-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Loading States */
+.pos-cache-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.pos-cache-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .pos-cache-dashboard-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .pos-cache-config-filters {
+        justify-content: center;
+    }
+    
+    .pos-cache-actions {
+        justify-content: center;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pos-cache-dashboard-content {
+        padding: 15px;
+    }
+    
+    .pos-cache-metric-card {
+        height: 100px;
+        padding: 20px;
+    }
+    
+    .metric-value {
+        font-size: 1.75rem;
+    }
+    
+    .metric-label {
+        font-size: 0.8rem;
+    }
+    
+    .pos-cache-config-comparison .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* Chart Container Styling */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-container canvas {
+    max-height: 300px;
+}
+
+/* Empty State */
+.pos-cache-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.pos-cache-empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.pos-cache-empty-state h4 {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.pos-cache-empty-state p {
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Export and Action Buttons */
+.pos-cache-export-btn,
+.pos-cache-refresh-btn,
+.pos-cache-clear-cache-btn {
+    transition: all 0.3s ease;
+}
+
+.pos-cache-export-btn:hover,
+.pos-cache-refresh-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.pos-cache-clear-cache-btn:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Tooltip Styling */
+.pos-cache-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.pos-cache-tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    z-index: 1000;
+    margin-bottom: 5px;
+}
+
+.pos-cache-tooltip:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #333;
+    z-index: 1000;
+}
+
+/* Animation for metric updates */
+.metric-update {
+    animation: pulse-highlight 0.6s ease-in-out;
+}
+
+@keyframes pulse-highlight {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(0, 123, 255, 0.1); }
+    100% { background-color: transparent; }
+}
+
+/* Print Styles */
+@media print {
+    .pos-cache-dashboard-controls,
+    .pos-cache-actions,
+    .recommendation-item button {
+        display: none !important;
+    }
+    
+    .pos-cache-metric-card {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #dee2e6 !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+    .pos-cache-dashboard-content {
+        background-color: #1a1d23;
+        color: #f8f9fa;
+    }
+    
+    .card {
+        background-color: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .card-header {
+        background-color: #2d3748 !important;
+        border-bottom-color: #4a5568 !important;
+        color: #f8f9fa !important;
+    }
+    
+    .table {
+        color: #f8f9fa;
+    }
+    
+    .table th {
+        background-color: #4a5568 !important;
+        color: #f8f9fa !important;
+    }
+    
+    .pos-cache-config-filter {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #f8f9fa;
+    }
+    
+    .pos-cache-config-filter:hover {
+        background-color: #4a5568;
+    }
+}

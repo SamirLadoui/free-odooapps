@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_exam_user,sl.exam.user,model_sl_exam,sl_school.group_school_user,1,1,1,0
+access_exam_manager,sl.exam.manager,model_sl_exam,sl_school.group_school_manager,1,1,1,1
+access_exam_result_user,sl.exam.result.user,model_sl_exam_result,sl_school.group_school_user,1,1,1,1
+access_exam_result_manager,sl.exam.result.manager,model_sl_exam_result,sl_school.group_school_manager,1,1,1,1

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- POS Cache Config Form View -->
+        <record id="view_pos_cache_config_form" model="ir.ui.view">
+            <field name="name">pos.cache.config.form</field>
+            <field name="model">pos.cache.config</field>
+            <field name="arch" type="xml">
+                <form string="POS Cache Configuration">
+                    <header>
+                        <button name="action_apply_to_pos_configs" type="object" 
+                                string="Apply to POS Configs" class="oe_highlight"
+                                attrs="{'invisible': [('pos_config_ids', '=', [])]}"/>
+                        <button name="action_test_configuration" type="object" 
+                                string="Test Configuration" class="oe_highlight"/>
+                        <field name="active" widget="boolean_toggle"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Configuration Name"/>
+                            </h1>
+                        </div>
+                        
+                        <notebook>
+                            <page string="Basic Settings" name="basic">
+                                <group>
+                                    <group string="Strategy">
+                                        <field name="cache_strategy"/>
+                                        <field name="pos_config_ids" widget="many2many_tags"/>
+                                    </group>
+                                    <group string="Performance">
+                                        <field name="cache_size_limit_mb"/>
+                                        <field name="preload_products_count"/>
+                                        <field name="lazy_load_batch_size"/>
+                                    </group>
+                                </group>
+                                
+                                <group string="Features">
+                                    <group>
+                                        <field name="enable_compression"/>
+                                        <field name="compression_level" attrs="{'invisible': [('enable_compression', '=', False)]}"/>
+                                        <field name="enable_image_lazy_loading"/>
+                                        <field name="image_quality" attrs="{'invisible': [('enable_image_lazy_loading', '=', False)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="enable_background_sync"/>
+                                        <field name="sync_interval_minutes" attrs="{'invisible': [('enable_background_sync', '=', False)]}"/>
+                                        <field name="auto_refresh_enabled"/>
+                                        <field name="cache_expiry_hours"/>
+                                    </group>
+                                </group>
+                            </page>
+                            
+                            <page string="Advanced Settings" name="advanced">
+                                <group>
+                                    <group string="Storage">
+                                        <field name="enable_indexeddb"/>
+                                        <field name="enable_service_worker"/>
+                                        <field name="max_concurrent_requests"/>
+                                    </group>
+                                    <group string="Analytics">
+                                        <field name="enable_analytics"/>
+                                        <field name="detailed_logging"/>
+                                        <field name="performance_warning_threshold"/>
+                                        <field name="cache_hit_ratio_target"/>
+                                    </group>
+                                </group>
+                                
+                                <group string="Priority Categories">
+                                    <field name="priority_category_ids" nolabel="1"/>
+                                </group>
+                            </page>
+                            
+                            <page string="Description" name="description">
+                                <field name="description" nolabel="1" placeholder="Describe this cache configuration..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- POS Cache Config Tree View -->
+        <record id="view_pos_cache_config_tree" model="ir.ui.view">
+            <field name="name">pos.cache.config.tree</field>
+            <field name="model">pos.cache.config</field>
+            <field name="arch" type="xml">
+                <tree string="POS Cache Configurations" decoration-muted="not active">
+                    <field name="name"/>
+                    <field name="cache_strategy"/>
+                    <field name="cache_size_limit_mb"/>
+                    <field name="preload_products_count"/>
+                    <field name="enable_compression"/>
+                    <field name="enable_image_lazy_loading"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- POS Cache Config Search View -->
+        <record id="view_pos_cache_config_search" model="ir.ui.view">
+            <field name="name">pos.cache.config.search</field>
+            <field name="model">pos.cache.config</field>
+            <field name="arch" type="xml">
+                <search string="Search Cache Configurations">
+                    <field name="name"/>
+                    <field name="cache_strategy"/>
+                    <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                    <filter string="Hybrid Strategy" name="hybrid" domain="[('cache_strategy', '=', 'hybrid')]"/>
+                    <filter string="Lazy Loading" name="lazy" domain="[('cache_strategy', '=', 'lazy')]"/>
+                    <filter string="Priority Based" name="priority" domain="[('cache_strategy', '=', 'priority')]"/>
+                    <filter string="Category Based" name="category" domain="[('cache_strategy', '=', 'category')]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Strategy" name="group_strategy" context="{'group_by': 'cache_strategy'}"/>
+                        <filter string="Active Status" name="group_active" context="{'group_by': 'active'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action for POS Cache Config -->
+        <record id="action_pos_cache_config" model="ir.actions.act_window">
+            <field name="name">Cache Configurations</field>
+            <field name="res_model">pos.cache.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first cache configuration!
+                </p>
+                <p>
+                    Cache configurations help optimize POS performance for large product catalogs.
+                    Define different strategies and apply them to your POS configurations.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

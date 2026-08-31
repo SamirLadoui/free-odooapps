@@ -73,7 +73,7 @@ class TestRestful(HttpCase):
         """invalidate_recordset arrived in 17.0; before that it was
         invalidate_cache on the recordset."""
         if hasattr(records, 'invalidate_recordset'):
-            records.invalidate_recordset(fields)
+            records.invalidate_cache(fields)
         else:
             records.invalidate_cache(fields)
 

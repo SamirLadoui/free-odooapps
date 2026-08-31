@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- POS Cache Analytics Form View -->
+        <record id="view_pos_cache_analytics_form" model="ir.ui.view">
+            <field name="name">pos.cache.analytics.form</field>
+            <field name="model">pos.cache.analytics</field>
+            <field name="arch" type="xml">
+                <form string="POS Cache Analytics" create="false" edit="false">
+                    <header>
+                        <field name="strategy_used" widget="badge"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="pos_config_id"/>
+                            </h1>
+                            <h2>
+                                <field name="pos_session_id"/>
+                            </h2>
+                        </div>
+                        
+                        <group>
+                            <group string="Cache Performance">
+                                <field name="cache_hit_ratio" widget="percentage"/>
+                                <field name="cache_miss_ratio" widget="percentage"/>
+                                <field name="avg_load_time"/>
+                                <field name="total_requests"/>
+                            </group>
+                            <group string="Cache Statistics">
+                                <field name="cache_hits"/>
+                                <field name="cache_misses"/>
+                                <field name="total_products_cached"/>
+                                <field name="cache_size_mb"/>
+                            </group>
+                        </group>
+                        
+                        <group>
+                            <group string="Performance Metrics">
+                                <field name="initial_load_time"/>
+                                <field name="product_search_time"/>
+                                <field name="category_load_time"/>
+                                <field name="browser_memory_usage"/>
+                                <field name="compression_ratio"/>
+                            </group>
+                            <group string="Loading Strategy">
+                                <field name="preloaded_products"/>
+                                <field name="lazy_loaded_products"/>
+                                <field name="max_cache_size_mb"/>
+                            </group>
+                        </group>
+                        
+                        <group>
+                            <group string="Session Information">
+                                <field name="session_start_time"/>
+                                <field name="session_end_time"/>
+                                <field name="session_duration"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- POS Cache Analytics Tree View -->
+        <record id="view_pos_cache_analytics_tree" model="ir.ui.view">
+            <field name="name">pos.cache.analytics.tree</field>
+            <field name="model">pos.cache.analytics</field>
+            <field name="arch" type="xml">
+                <tree string="POS Cache Analytics" default_order="create_date desc" 
+                      decoration-success="cache_hit_ratio >= 80"
+                      decoration-warning="cache_hit_ratio >= 60 and cache_hit_ratio &lt; 80"
+                      decoration-danger="cache_hit_ratio &lt; 60">
+                    <field name="create_date"/>
+                    <field name="pos_config_id"/>
+                    <field name="pos_session_id"/>
+                    <field name="strategy_used"/>
+                    <field name="cache_hit_ratio" widget="percentage"/>
+                    <field name="avg_load_time"/>
+                    <field name="total_products_cached"/>
+                    <field name="cache_size_mb"/>
+                    <field name="session_duration"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- POS Cache Analytics Search View -->
+        <record id="view_pos_cache_analytics_search" model="ir.ui.view">
+            <field name="name">pos.cache.analytics.search</field>
+            <field name="model">pos.cache.analytics</field>
+            <field name="arch" type="xml">
+                <search string="Search Cache Analytics">
+                    <field name="pos_config_id"/>
+                    <field name="pos_session_id"/>
+                    <field name="strategy_used"/>
+                    <filter string="Today" name="today" 
+                            domain="[('create_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                    <filter string="Last 7 Days" name="last_week" 
+                            domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                    <filter string="Last 30 Days" name="last_month" 
+                            domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                    <separator/>
+                    <filter string="High Performance" name="high_performance" 
+                            domain="[('cache_hit_ratio', '&gt;=', 80)]"/>
+                    <filter string="Medium Performance" name="medium_performance" 
+                            domain="[('cache_hit_ratio', '&gt;=', 60), ('cache_hit_ratio', '&lt;', 80)]"/>
+                    <filter string="Low Performance" name="low_performance" 
+                            domain="[('cache_hit_ratio', '&lt;', 60)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="POS Configuration" name="group_config" context="{'group_by': 'pos_config_id'}"/>
+                        <filter string="Strategy" name="group_strategy" context="{'group_by': 'strategy_used'}"/>
+                        <filter string="Date" name="group_date" context="{'group_by': 'create_date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- POS Cache Analytics Pivot View -->
+        <record id="view_pos_cache_analytics_pivot" model="ir.ui.view">
+            <field name="name">pos.cache.analytics.pivot</field>
+            <field name="model">pos.cache.analytics</field>
+            <field name="arch" type="xml">
+                <pivot string="Cache Analytics">
+                    <field name="pos_config_id" type="row"/>
+                    <field name="strategy_used" type="col"/>
+                    <field name="cache_hit_ratio" type="measure"/>
+                    <field name="avg_load_time" type="measure"/>
+                    <field name="total_products_cached" type="measure"/>
+                    <field name="cache_size_mb" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- POS Cache Analytics Graph View -->
+        <record id="view_pos_cache_analytics_graph" model="ir.ui.view">
+            <field name="name">pos.cache.analytics.graph</field>
+            <field name="model">pos.cache.analytics</field>
+            <field name="arch" type="xml">
+                <graph string="Cache Performance">
+                    <field name="create_date" type="row" interval="day"/>
+                    <field name="cache_hit_ratio" type="measure"/>
+                    <field name="avg_load_time" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Action for POS Cache Analytics -->
+        <record id="action_pos_cache_analytics" model="ir.actions.act_window">
+            <field name="name">Cache Analytics</field>
+            <field name="res_model">pos.cache.analytics</field>
+            <field name="view_mode">tree,form,pivot,graph</field>
+            <field name="context">{'search_default_last_week': 1, 'search_default_group_config': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No cache analytics data yet!
+                </p>
+                <p>
+                    Analytics data will appear here once you start using POS with cache optimization enabled.
+                    This will help you monitor and improve cache performance.
+                </p>
+            </field>
+        </record>
+
+        <!-- Dashboard Action for Cache Analytics -->
+        <record id="action_pos_cache_analytics_dashboard" model="ir.actions.act_window">
+            <field name="name">Cache Performance Dashboard</field>
+            <field name="res_model">pos.cache.analytics</field>
+            <field name="view_mode">pivot,graph,tree</field>
+            <field name="context">{'search_default_last_month': 1}</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Security Rules for POS Cache Config -->
+        <record id="pos_cache_config_rule_multi_company" model="ir.rule">
+            <field name="name">POS Cache Config: multi-company</field>
+            <field name="model_id" ref="model_pos_cache_config"/>
+            <field name="domain_force">['|', ('pos_config_ids', '=', False), ('pos_config_ids.company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Security Rules for POS Cache Analytics -->
+        <record id="pos_cache_analytics_rule_multi_company" model="ir.rule">
+            <field name="name">POS Cache Analytics: multi-company</field>
+            <field name="model_id" ref="model_pos_cache_analytics"/>
+            <field name="domain_force">[('pos_config_id.company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Security Rules for POS Session Access -->
+        <record id="pos_cache_analytics_rule_session_access" model="ir.rule">
+            <field name="name">POS Cache Analytics: session access</field>
+            <field name="model_id" ref="model_pos_cache_analytics"/>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+            <field name="domain_force">['|', ('pos_session_id.user_id', '=', user.id), ('pos_session_id', '=', False)]</field>
+        </record>
+
+        <!-- Manager Override Rule -->
+        <record id="pos_cache_analytics_rule_manager_override" model="ir.rule">
+            <field name="name">POS Cache Analytics: manager override</field>
+            <field name="model_id" ref="model_pos_cache_analytics"/>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+        </record>
+
+    </data>
+</odoo>

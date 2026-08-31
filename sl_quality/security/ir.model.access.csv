@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nonconformity_user,sl.quality.nonconformity.user,model_sl_quality_nonconformity,group_quality_user,1,1,1,0
+access_nonconformity_manager,sl.quality.nonconformity.manager,model_sl_quality_nonconformity,group_quality_manager,1,1,1,1
+access_quality_action_user,sl.quality.action.user,model_sl_quality_action,group_quality_user,1,1,1,0
+access_quality_action_manager,sl.quality.action.manager,model_sl_quality_action,group_quality_manager,1,1,1,1

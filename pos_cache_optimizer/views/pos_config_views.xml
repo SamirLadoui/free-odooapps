@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- POS Configuration Views -->
+        <record id="view_pos_config_form_cache" model="ir.ui.view">
+            <field name="name">pos.config.form.cache</field>
+            <field name="model">pos.config</field>
+            <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <notebook>
+                        <page string="Cache Optimization" name="cache_optimization">
+                            <group>
+                                <group string="Cache Settings">
+                                    <field name="enable_product_cache"/>
+                                    <field name="cache_strategy" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                    <field name="cache_size_limit" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                    <field name="preload_products_count" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                    <field name="cache_expiry_hours" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                </group>
+                                <group string="Performance Options">
+                                    <field name="enable_image_lazy_loading" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                    <field name="cache_compression" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                    <field name="enable_background_sync" attrs="{'invisible': [('enable_product_cache', '=', False)]}"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Priority Categories" attrs="{'invisible': [('enable_product_cache', '=', False)]}">
+                                <field name="priority_categories" widget="many2many_tags" 
+                                    attrs="{'invisible': [('cache_strategy', 'not in', ['priority', 'hybrid'])]}"/>
+                            </group>
+                            
+                            <div class="oe_button_box" attrs="{'invisible': [('enable_product_cache', '=', False)]}">
+                                <button name="get_cache_statistics" type="object" 
+                                        class="oe_stat_button" icon="fa-bar-chart">
+                                    <div class="o_stat_info">
+                                        <span class="o_stat_text">Cache Stats</span>
+                                    </div>
+                                </button>
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert" attrs="{'invisible': [('enable_product_cache', '=', True)]}">
+                                <strong>Cache Disabled:</strong> Enable product cache to improve POS performance with large product catalogs.
+                            </div>
+                            
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Add cache info to POS configuration tree view -->
+        <record id="view_pos_config_tree_cache" model="ir.ui.view">
+            <field name="name">pos.config.tree.cache</field>
+            <field name="model">pos.config</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_config_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="enable_product_cache" string="Cache"/>
+                    <field name="cache_strategy" string="Strategy"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
