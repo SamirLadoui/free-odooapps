@@ -49,12 +49,28 @@ patch(PosStore.prototype, {
             return false;
         }
 
-        const order = this.getOrder();
+        const order = this.get_order();
+        // The till only holds part of the catalogue, so a product sold weeks
+        // ago is very often not loaded. Fetch the ones that are missing before
+        // building the lines: skipping them silently returns nothing and looks
+        // to the cashier like the button did not work.
+        const missing = payload.lines
+            .map((line) => line.product_id)
+            .filter((id) => !this.models["product.product"].get(id));
+        if (missing.length) {
+            try {
+                await this.data.read("product.product", missing);
+            } catch {
+                // Fall through: whatever could not be fetched is reported below.
+            }
+        }
+
+        const absent = [];
         for (const line of payload.lines) {
             const product = this.models["product.product"].get(line.product_id);
             if (!product) {
-                // The product was taken out of the point of sale since the
-                // sale. Skip it rather than failing the whole return.
+                // Genuinely gone - archived, or no longer sold here.
+                absent.push(line.product_name);
                 continue;
             }
             // 19.0 builds the line from the template - it reads taxes off it
@@ -75,11 +91,21 @@ patch(PosStore.prototype, {
         // An integer, not the relation: a many2one to pos.order shipped to
         // the client makes it build a half-made order and crash. The server
         // turns this back into the link.
+        if (absent.length) {
+            this.dialog.add(AlertDialog, {
+                title: _t("Return"),
+                body: _t(
+                    "These are no longer available in this point of sale and " +
+                    "were not put back: %s",
+                    absent.join(", ")
+                ),
+            });
+        }
         order.sl_return_of_order_ref = payload.order_id;
-        if (payload.partner_id && !order.getPartner()) {
+        if (payload.partner_id && !order.get_partner()) {
             const partner = this.models["res.partner"].get(payload.partner_id);
             if (partner) {
-                order.setPartner(partner);
+                order.set_partner(partner);
             }
         }
         return true;
