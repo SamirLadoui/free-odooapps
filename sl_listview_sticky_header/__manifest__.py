@@ -22,12 +22,8 @@ There is nothing to configure. Install it and the headers stay put.
     'maintainer': 'Samir Ladoui',
     'website': 'https://www.linkedin.com/in/samir-ladoui',
     'license': 'LGPL-3',
+    'data': ['views/assets.xml'],
     'depends': ['web'],
-    'assets': {
-        'web.assets_backend': [
-            'sl_listview_sticky_header/static/src/scss/sticky_header.scss',
-        ],
-    },
     'images': ['static/description/banner.png'],
     'installable': True,
     'application': False,
