@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The number goes in front of the description rather than in a column of
+         its own: a new column has to be counted into the colspan of every
+         section and note row, and those are spelled differently in every
+         release. This reads the same on all of them and cannot misalign the
+         table. -->
+    <template id="report_invoice_document_line_numbers"
+              inherit_id="account.report_invoice_document">
+        <xpath expr="//td[@name='account_invoice_line_name']/span[1]"
+               position="before">
+            <span class="sl_line_number" t-if="line.sl_line_number">
+                <span t-out="line.sl_line_number"/>.
+            </span>
+        </xpath>
+    </template>
+</odoo>

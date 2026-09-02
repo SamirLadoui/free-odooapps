@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_definition_list" model="ir.ui.view">
+        <field name="name">sl.tier.definition.list</field>
+        <field name="model">sl.tier.definition</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Tiers">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="trigger_field"/>
+                <field name="trigger_value"/>
+                <field name="reviewer_ids" widget="many2many_tags" optional="show"/>
+                <field name="reviewer_group_id" optional="show"/>
+                <field name="model_name" attrs="{'column_invisible': [(1, '=', 1)]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_definition_form" model="ir.ui.view">
+        <field name="name">sl.tier.definition.form</field>
+        <field name="model">sl.tier.definition</field>
+        <field name="arch" type="xml">
+            <form string="Approval Tier">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Manager approves large orders"/></h1>
+                    </div>
+                    <group>
+                        <group string="What Needs Approving">
+                            <field name="model_id"/>
+                            <field name="model_name" invisible="1"/>
+                            <field name="trigger_field"/>
+                            <field name="trigger_value" placeholder="sale"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Who Approves It">
+                            <field name="reviewer_ids" widget="many2many_tags"/>
+                            <field name="reviewer_group_id"/>
+                        </group>
+                    </group>
+                    <group string="Only When">
+                        <field name="domain" widget="domain"
+                               options="{'model': 'model_name'}" nolabel="1"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Several tiers on one model are asked in sequence, and the
+                        record cannot move until every one of them has agreed.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_definition" model="ir.actions.act_window">
+        <field name="name">Approval Tiers</field>
+        <field name="res_model">sl.tier.definition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Say what needs approving</p>
+            <p>Pick a model, the field whose change needs agreeing to, the value
+               that needs it, and who agrees. No code for any of it.</p>
+        </field>
+    </record>
+
+    <record id="view_review_list" model="ir.ui.view">
+        <field name="name">sl.tier.review.list</field>
+        <field name="model">sl.tier.review</field>
+        <field name="arch" type="xml">
+            <tree string="Approvals" create="false"
+                  decoration-danger="status == 'rejected'"
+                  decoration-success="status == 'approved'">
+                <field name="record_label"/>
+                <field name="name"/>
+                <field name="res_model" optional="hide"/>
+                <field name="requested_by_id"/>
+                <field name="requested_on"/>
+                <field name="done_by_id" optional="show"/>
+                <field name="done_on" optional="hide"/>
+                <field name="comment" optional="show"/>
+                <field name="round" optional="hide"/>
+                <field name="status" widget="badge"/>
+                <button name="action_approve" type="object" string="Approve"
+                        icon="fa-check" attrs="{'invisible': [('status', '!=', 'pending')]}"/>
+                <button name="action_open_record" type="object" string="Open"
+                        icon="fa-external-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_review_form" model="ir.ui.view">
+        <field name="name">sl.tier.review.form</field>
+        <field name="model">sl.tier.review</field>
+        <field name="arch" type="xml">
+            <form string="Approval" create="false">
+                <header>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" attrs="{'invisible': [('status', '!=', 'pending')]}"/>
+                    <button name="action_reject" type="object" string="Reject" attrs="{'invisible': [('status', '!=', 'pending')]}"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="record_label"/>
+                            <field name="res_model"/>
+                            <field name="round"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="requested_on"/>
+                            <field name="done_by_id"/>
+                            <field name="done_on"/>
+                        </group>
+                    </group>
+                    <group string="Comment">
+                        <field name="comment" nolabel="1"
+                               placeholder="Rejected: the discount needs the customer's written agreement first."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_review_search" model="ir.ui.view">
+        <field name="name">sl.tier.review.search</field>
+        <field name="model">sl.tier.review</field>
+        <field name="arch" type="xml">
+            <search string="Approvals">
+                <field name="record_label"/>
+                <field name="name"/>
+                <filter name="waiting" string="Waiting" domain="[('status', '=', 'pending')]"/>
+                <filter name="rejected" string="Rejected" domain="[('status', '=', 'rejected')]"/>
+                <group name="group_by">
+                    <filter name="by_model" string="Model" context="{'group_by': 'res_model'}"/>
+                    <filter name="by_status" string="Status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_review" model="ir.actions.act_window">
+        <field name="name">Approvals</field>
+        <field name="res_model">sl.tier.review</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_waiting': 1}</field>
+    </record>
+
+    <menuitem id="menu_tier_root" name="Approvals" parent="base.menu_administration"
+              sequence="70" groups="base.group_user"/>
+    <menuitem id="menu_tier_reviews" name="Approvals" parent="menu_tier_root"
+              action="action_review" sequence="10"/>
+    <menuitem id="menu_tier_definitions" name="Approval Tiers" parent="menu_tier_root"
+              action="action_definition" sequence="20" groups="base.group_system"/>
+
+</odoo>

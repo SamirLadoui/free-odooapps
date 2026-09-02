@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings before 17.0 are rows of o_setting_box divs; <setting> arrived
+     with 17.0, so this file is the pre-17 spelling of the same three blocks. -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.sl.password.policy</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="25"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='allow_import']" position="before">
+                <div class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane"/>
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">Password Must Contain</span>
+                        <div class="text-muted">
+                            Checked whenever a password is set, wherever it is
+                            set from.
+                        </div>
+                        <div class="content-group mt16">
+                            <div>
+                                <field name="sl_password_uppercase" class="oe_inline"/>
+                                <label for="sl_password_uppercase"/>
+                            </div>
+                            <div>
+                                <field name="sl_password_lowercase" class="oe_inline"/>
+                                <label for="sl_password_lowercase"/>
+                            </div>
+                            <div>
+                                <field name="sl_password_digit" class="oe_inline"/>
+                                <label for="sl_password_digit"/>
+                            </div>
+                            <div>
+                                <field name="sl_password_special" class="oe_inline"/>
+                                <label for="sl_password_special"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane"/>
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">Passwords Remembered</span>
+                        <div class="text-muted">
+                            A password cannot be used again while it is one of
+                            the last this many. Zero remembers nothing.
+                        </div>
+                        <div class="content-group mt16">
+                            <field name="sl_password_history" class="oe_inline"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane"/>
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">Password Expires After</span>
+                        <div class="text-muted">
+                            In days. Zero means passwords do not expire.
+                            Members of Password Never Expires are not asked
+                            either way.
+                        </div>
+                        <div class="content-group mt16">
+                            <field name="sl_password_expiry_days" class="oe_inline"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
