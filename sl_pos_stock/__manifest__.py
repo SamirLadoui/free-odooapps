@@ -43,10 +43,10 @@ check.
     'data': ['views/pos_config_views.xml'],
     'assets': {
         'web.assets_tests': [
-            'pos_stock_enhancements/static/tests/tours/**/*',
+            'sl_pos_stock/static/tests/tours/**/*',
         ],
         'point_of_sale._assets_pos': [
-            'pos_stock_enhancements/static/src/js/pos_stock.js',
+            'sl_pos_stock/static/src/js/pos_stock.js',
         ],
     },
     'images': ['static/description/banner.gif'],
