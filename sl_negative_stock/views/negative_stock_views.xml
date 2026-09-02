@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rule_list" model="ir.ui.view">
+        <field name="name">sl.negative.stock.rule.list</field>
+        <field name="model">sl.negative.stock.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Negative Stock Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="location_id"/>
+                <field name="include_children"/>
+                <field name="product_ids" widget="many2many_tags" optional="hide"/>
+                <field name="category_ids" widget="many2many_tags" optional="show"/>
+                <field name="behaviour"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_rule_form" model="ir.ui.view">
+        <field name="name">sl.negative.stock.rule.form</field>
+        <field name="model">sl.negative.stock.rule</field>
+        <field name="arch" type="xml">
+            <form string="Negative Stock Rule">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Main warehouse must not go negative"/></h1>
+                    </div>
+                    <group>
+                        <group string="Where">
+                            <field name="location_id"/>
+                            <field name="include_children"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="What Happens">
+                            <field name="behaviour"/>
+                        </group>
+                    </group>
+                    <group string="Which Products">
+                        <field name="product_ids" widget="many2many_tags"/>
+                        <field name="category_ids" widget="many2many_tags"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        The first rule that fits a move is the one applied, so the
+                        order matters. Anywhere without a rule behaves exactly as
+                        Odoo always did.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rule" model="ir.actions.act_window">
+        <field name="name">Negative Stock Rules</field>
+        <field name="res_model">sl.negative.stock.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Say where stock may not go below zero</p>
+            <p>Odoo allows negative stock everywhere, so a mistake in a warehouse
+               looks like the intended behaviour in a shop. A rule draws the line.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_negative_stock" name="Negative Stock Rules"
+              parent="stock.menu_stock_config_settings"
+              action="action_rule" sequence="90"
+              groups="stock.group_stock_manager"/>
+
+</odoo>
