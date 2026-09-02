@@ -1,4 +1,4 @@
-odoo.define("pos_stock_enhancements.pos_stock", function (require) {
+odoo.define("sl_pos_stock.pos_stock", function (require) {
     "use strict";
     /**
      * Stock checking in the Point of Sale (15.0 / 16.0, legacy POS).
