@@ -43,7 +43,7 @@ check.
     'data': ['views/pos_config_views.xml'],
     'assets': {
         'point_of_sale.assets': [
-            'sl_pos_stock/static/src/js/pos_stock.js',
+            'pos_stock_enhancements/static/src/js/pos_stock.js',
         ],
     },
     'images': ['static/description/banner.gif'],
