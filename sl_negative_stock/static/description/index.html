@@ -1,0 +1,112 @@
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h2 class="oe_slogan">Block Negative Stock</h2>
+            <h3 class="oe_slogan">Draw the line where it matters, and leave the rest of Odoo alone</h3>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <p class="oe_mt32">Odoo lets stock go negative everywhere, on purpose: a shop that receives goods after it sells them could not trade otherwise. The cost is that a genuine picking mistake in a warehouse looks exactly like the intended behaviour in a shop, and nobody finds it until a stock count. This module lets you say where going below zero is refused, where it is merely worth recording, and where nothing should change at all.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Key Features</h3>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Rules, not a switch</h4>
+            <p class="oe_mt8 text-center">A rule names a location, and optionally products or categories. Everywhere without a rule behaves exactly as Odoo always did.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Refuse or record</h4>
+            <p class="oe_mt8 text-center">Refusing the move is right in a warehouse that counts. Allowing it and writing it on the transfer is right where going under is normal but worth knowing about.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Checked when stock leaves</h4>
+            <p class="oe_mt8 text-center">The check runs when the transfer is validated, not when it is planned. A move created today for next week is never refused because the goods have not arrived yet.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">On hand, not forecast</h4>
+            <p class="oe_mt8 text-center">A forecast counts what is expected to arrive. Stock that has not arrived cannot be picked off a shelf, so the quantity on hand is what is compared.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">A rule covers its shelves</h4>
+            <p class="oe_mt8 text-center">A rule on a warehouse applies to every location under it by default, so you write one rule instead of one per shelf. It can be told not to.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Order decides</h4>
+            <p class="oe_mt8 text-center">Two rules about the same location is a question the sequence answers: the first rule that fits is the one applied, so a narrow exception can sit above a broad rule.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Getting Started</h3>
+        <div class="oe_span12">
+            <ol style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Install the module. Nothing changes until you write a rule.</li>
+                <li class="oe_mt8">Go to Inventory &gt; Configuration &gt; Negative Stock Rules.</li>
+                <li class="oe_mt8">Create a rule, pick the location it covers, and choose whether to refuse the move or record it.</li>
+                <li class="oe_mt8">Leave Products and Categories empty to cover everything at that location, or name the ones that matter.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Good To Know</h3>
+        <div class="oe_span12">
+            <ul style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Receipts and returns are never refused: stock arriving is not coming off anybody&#x27;s shelf.</li>
+                <li class="oe_mt8">Only internal locations are checked. Suppliers, customers, scrap and inventory-adjustment locations are left alone.</li>
+                <li class="oe_mt8">Services and non-storable products are skipped, since they have no quantity to go under.</li>
+                <li class="oe_mt8">Rules are per company, and a rule cannot point at another company&#x27;s location.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <h3>Supported Odoo Versions</h3>
+            <p class="oe_mt16"><strong>14.0 &middot; 15.0 &middot; 16.0 &middot; 17.0 &middot; 18.0 &middot; 19.0</strong></p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Contact Us</h3>
+        <div class="oe_span12 text-center">
+            <p class="oe_mt16">
+                If you have any queries or need support for this module, feel free to contact us.
+            </p>
+            <p class="oe_mt16">
+                <a href="https://www.linkedin.com/in/samir-ladoui" target="_blank" class="oe_social_media">
+                    <i class="fa fa-linkedin-square fa-2x"></i> LinkedIn: samir-ladoui
+                </a>
+                <a href="https://wa.me/+213658127254" target="_blank" class="oe_social_media"
+                    style="margin-left: 20px;">
+                    <i class="fa fa-whatsapp fa-2x"></i> WhatsApp: +213658127254
+                </a>
+            </p>
+            <p class="oe_mt8">
+                Email: <a href="mailto:samir.odoo.apps2325@gmail.com">samir.odoo.apps2325@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>
