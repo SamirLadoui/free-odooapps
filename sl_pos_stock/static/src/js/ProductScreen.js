@@ -1,4 +1,4 @@
-odoo.define("pos_stock_enhancements.ProductScreen", function (require) {
+odoo.define("sl_pos_stock.ProductScreen", function (require) {
   "use strict";
 
   const ProductScreen = require("point_of_sale.ProductScreen");
