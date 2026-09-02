@@ -1,4 +1,4 @@
-odoo.define("sl_pos_stock.models", function (require) {
+odoo.define("pos_stock_enhancements.models", function (require) {
   "use strict";
 
   var models = require("point_of_sale.models");
