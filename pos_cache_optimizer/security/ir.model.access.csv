@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_pos_cache_config_user,pos.cache.config.user,model_pos_cache_config,point_of_sale.group_pos_user,1,0,0,0
-access_pos_cache_config_manager,pos.cache.config.manager,model_pos_cache_config,point_of_sale.group_pos_manager,1,1,1,1
-access_pos_cache_analytics_user,pos.cache.analytics.user,model_pos_cache_analytics,point_of_sale.group_pos_user,1,0,0,0
-access_pos_cache_analytics_manager,pos.cache.analytics.manager,model_pos_cache_analytics,point_of_sale.group_pos_manager,1,1,1,1
-access_pos_cache_analytics_system,pos.cache.analytics.system,model_pos_cache_analytics,base.group_system,1,1,1,1
