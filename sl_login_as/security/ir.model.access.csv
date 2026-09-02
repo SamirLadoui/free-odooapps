@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_log_manager,login as log manager,model_sl_login_as_log,base.group_erp_manager,1,0,0,0
+access_wizard_manager,login as wizard,model_sl_login_as_wizard,base.group_erp_manager,1,1,1,1

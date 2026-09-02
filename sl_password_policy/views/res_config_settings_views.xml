@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.form.sl.password.policy</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="25"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='allow_import']" position="before">
+                <setting string="Password Must Contain"
+                         help="Checked whenever a password is set, wherever it is set from.">
+                    <field name="sl_password_uppercase"/>
+                    <field name="sl_password_lowercase"/>
+                    <field name="sl_password_digit"/>
+                    <field name="sl_password_special"/>
+                </setting>
+                <setting string="Passwords Remembered"
+                         help="A password cannot be used again while it is one of the last this many. Zero remembers nothing.">
+                    <field name="sl_password_history"/>
+                </setting>
+                <setting string="Password Expires After"
+                         help="In days. Zero means passwords do not expire. Members of Password Never Expires are not asked either way.">
+                    <field name="sl_password_expiry_days"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
