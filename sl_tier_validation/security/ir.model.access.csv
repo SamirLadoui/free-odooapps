@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_definition_user,tier definition user,model_sl_tier_definition,base.group_user,1,0,0,0
+access_definition_manager,tier definition manager,model_sl_tier_definition,base.group_system,1,1,1,1
+access_review_user,tier review user,model_sl_tier_review,base.group_user,1,1,1,0
+access_review_manager,tier review manager,model_sl_tier_review,base.group_system,1,1,1,1
