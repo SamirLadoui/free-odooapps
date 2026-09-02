@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_show_cost" model="res.groups">
+        <field name="name">Show Cost Price</field>
+        <field name="comment">Members can see and change the cost of a product.
+            Everybody else gets a product form with no cost on it at all.</field>
+    </record>
+
+    <!-- Somebody has to be able to see it the moment this is installed, and
+         the settings administrator is the least surprising choice. -->
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('sl_hide_cost.group_show_cost'))]"/>
+    </record>
+</odoo>
