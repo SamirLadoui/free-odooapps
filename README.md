@@ -33,9 +33,12 @@ check it - run them with `--test-tags=/<module>`.
 | [`sl_module_record`](sl_module_record/) | **Configuration Recorder** — Record configuration changes and download them as an installable module | 22 |
 | [`sl_negative_stock`](sl_negative_stock/) | **Negative Stock Rules** — Say where stock may not go below zero, and where it may | 16 |
 | [`sl_password_policy`](sl_password_policy/) | **Password Policy** — Complexity rules, no reuse of old passwords, and expiry | 20 |
+| [`sl_pdf_watermark`](sl_pdf_watermark/) | **PDF Watermark** — Print DRAFT, PAID or anything else across a document | 13 |
 | [`sl_pos_return`](sl_pos_return/) | **Product Return In POS** — Give items back against a past receipt, from the till | 16 |
 | [`sl_product_brand`](sl_product_brand/) | **Product Brands** — Group products by brand, then filter and report on them | 9 |
+| [`sl_product_sequence`](sl_product_sequence/) | **Product Reference Numbering** — Give products an internal reference from a sequence | 15 |
 | [`sl_quality`](sl_quality/) | **Quality Management** — Non-conformities, root cause analysis and corrective actions | 20 |
+| [`sl_readonly_user`](sl_readonly_user/) | **Read Only User** — One group that lets a user see everything and change nothing | 14 |
 | [`sl_report_to_printer`](sl_report_to_printer/) | **Report to Printer** — Send Odoo reports straight to a CUPS printer instead of downloading a PDF | 18 |
 | [`sl_restful`](sl_restful/) | **REST API** — A small REST API over any Odoo model, authenticated by API key | 31 |
 | [`sl_sale_product_image`](sl_sale_product_image/) | **Product Images On Quotations** — Print each product picture beside its line on the quotation | 9 |
