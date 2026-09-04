@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sl_watermark_rule_list" model="ir.ui.view">
+        <field name="name">sl.watermark.rule.list</field>
+        <field name="model">sl.watermark.rule</field>
+        <field name="arch" type="xml">
+            <list string="Watermark Rules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="text"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sl_watermark_rule_form" model="ir.ui.view">
+        <field name="name">sl.watermark.rule.form</field>
+        <field name="model">sl.watermark.rule</field>
+        <field name="arch" type="xml">
+            <form string="Watermark Rule">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Unpaid invoices"/>
+                        <field name="model_id" options="{'no_create': True}"/>
+                        <field name="model_name" invisible="1"/>
+                        <field name="domain" widget="domain"
+                               options="{'model': 'model_name'}"/>
+                        <field name="active" invisible="1"/>
+                        <field name="sequence"/>
+                        <field name="company_id"
+                               groups="base.group_multi_company"/>
+                    </group>
+                    <group string="How It Looks">
+                        <field name="text" placeholder="DRAFT"/>
+                        <field name="color" placeholder="#d0021b"/>
+                        <field name="opacity"/>
+                        <field name="angle"/>
+                        <field name="font_size"/>
+                    </group>
+                    <div class="text-muted">
+                        The watermark is tiled behind the page, so it repeats
+                        down a long document and cannot move the content.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sl_watermark_rule" model="ir.actions.act_window">
+        <field name="name">Watermark Rules</field>
+        <field name="res_model">sl.watermark.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a watermark rule</p>
+            <p>
+                Pick a kind of document and the state it has to be in, and say
+                what to print across it.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sl_watermark_rule" name="Watermark Rules"
+              parent="base.menu_custom" action="action_sl_watermark_rule"
+              sequence="95" groups="base.group_system"/>
+
+</odoo>

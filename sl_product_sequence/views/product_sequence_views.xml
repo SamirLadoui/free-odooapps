@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_category_form_sequence" model="ir.ui.view">
+        <field name="name">product.category.form.sequence</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="sl_sequence_id" options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_company_form_product_sequence" model="ir.ui.view">
+        <field name="name">res.company.form.product.sequence</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <field name="currency_id" position="after">
+                <field name="sl_product_sequence_id"
+                       options="{'no_create': True}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_sl_product_reference_wizard_form" model="ir.ui.view">
+        <field name="name">sl.product.reference.wizard.form</field>
+        <field name="model">sl.product.reference.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assign References">
+                <div class="alert alert-info" role="status">
+                    <field name="product_count" class="oe_inline" readonly="1"/>
+                    product(s) selected,
+                    <field name="todo_count" class="oe_inline" readonly="1"/>
+                    of them will be given a reference. Products that already
+                    have one are never changed.
+                </div>
+                <footer>
+                    <button name="action_assign" type="object"
+                            string="Assign" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sl_product_reference_wizard" model="ir.actions.act_window">
+        <field name="name">Assign References</field>
+        <field name="res_model">sl.product.reference.wizard</field>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_sl_product_reference_wizard_variant"
+            model="ir.actions.act_window">
+        <field name="name">Assign References</field>
+        <field name="res_model">sl.product.reference.wizard</field>
+        <field name="binding_model_id" ref="product.model_product_product"/>
+        <field name="binding_view_types">list</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
