@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- web.external_layout is where every printed document passes, and it has
+         already worked out which record is being printed by the time this
+         runs. A stylesheet rather than an element: a watermark that is part of
+         the flow can push a table across a page boundary. -->
+    <template id="external_layout_watermark" inherit_id="web.external_layout">
+        <xpath expr="." position="inside">
+            <t t-set="sl_watermark_css"
+               t-value="o and o.env['sl.watermark.rule']._css_for(o) or ''"/>
+            <style t-if="sl_watermark_css" type="text/css"
+                   t-out="sl_watermark_css"/>
+        </xpath>
+    </template>
+</odoo>
