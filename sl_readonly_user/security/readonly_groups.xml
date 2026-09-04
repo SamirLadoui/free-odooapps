@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_read_only" model="res.groups">
+        <field name="name">Read Only</field>
+        <field name="comment">Members can look at everything their other
+            groups allow and change none of it. Every create, write and delete
+            is refused, on every model.</field>
+    </record>
+</odoo>
