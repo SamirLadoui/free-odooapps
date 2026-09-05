@@ -11,6 +11,7 @@ check it - run them with `--test-tags=/<module>`.
 | [`sl_attachment_preview`](sl_attachment_preview/) | **Attachment Preview** — Open any attachment in a preview page instead of downloading it | 11 |
 | [`sl_auto_backup`](sl_auto_backup/) | **Database Auto-Backup** — Scheduled database backups to a local directory or a remote SFTP server, with retention and failure alerts | 8 |
 | [`sl_biometric_attendance`](sl_biometric_attendance/) | **Biometric Device Attendance** — Download attendance from ZKTeco biometric devices into Odoo | 18 |
+| [`sl_connector_base`](sl_connector_base/) | **Connector Base** — The shared half of any integration: links, log and retries | 26 |
 | [`sl_contract`](sl_contract/) | **Recurring Contracts** — Recurring customer contracts that invoice themselves on schedule | 28 |
 | [`sl_currency_rate_update`](sl_currency_rate_update/) | **Currency Rate Update** — Fetch daily exchange rates automatically from the European Central Bank | 12 |
 | [`sl_data_cleanup`](sl_data_cleanup/) | **Remove Data** — Clear transactional data before you go live | 16 |
