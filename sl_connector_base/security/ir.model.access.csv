@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sl_connector_mapping_user,sl.connector.mapping.user,model_sl_connector_mapping,base.group_user,1,0,0,0
+access_sl_connector_mapping_system,sl.connector.mapping.system,model_sl_connector_mapping,base.group_system,1,1,1,1
+access_sl_connector_log_user,sl.connector.log.user,model_sl_connector_log,base.group_user,1,0,0,0
+access_sl_connector_log_system,sl.connector.log.system,model_sl_connector_log,base.group_system,1,0,1,1
