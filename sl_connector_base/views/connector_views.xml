@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sl_connector_log_list" model="ir.ui.view">
+        <field name="name">sl.connector.log.list</field>
+        <field name="model">sl.connector.log</field>
+        <field name="arch" type="xml">
+            <list string="Synchronisation Log" create="false"
+                  decoration-danger="state == 'error'"
+                  decoration-muted="state == 'skipped'">
+                <field name="create_date" string="When"/>
+                <field name="backend_name"/>
+                <field name="operation"/>
+                <field name="external_id" optional="show"/>
+                <field name="model_name" optional="hide"/>
+                <field name="duration" optional="hide"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sl_connector_log_form" model="ir.ui.view">
+        <field name="name">sl.connector.log.form</field>
+        <field name="model">sl.connector.log</field>
+        <field name="arch" type="xml">
+            <form string="Synchronisation Log" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <field name="backend_name"/>
+                        <field name="operation"/>
+                        <field name="state"/>
+                        <field name="create_date" string="When"/>
+                        <field name="duration"/>
+                        <field name="external_id"/>
+                        <field name="model_name"/>
+                        <field name="res_id"/>
+                    </group>
+                    <group string="What The Other Side Said"
+                           invisible="message == False">
+                        <field name="message" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sl_connector_log_search" model="ir.ui.view">
+        <field name="name">sl.connector.log.search</field>
+        <field name="model">sl.connector.log</field>
+        <field name="arch" type="xml">
+            <search string="Synchronisation Log">
+                <field name="operation"/>
+                <field name="external_id"/>
+                <field name="backend_name"/>
+                <filter name="failed" string="Failed"
+                        domain="[('state', '=', 'error')]"/>
+                <group name="group_by">
+                    <filter name="by_operation" string="Operation"
+                            context="{'group_by': 'operation'}"/>
+                    <filter name="by_state" string="Result"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="by_backend" string="Backend"
+                            context="{'group_by': 'backend_name'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sl_connector_log" model="ir.actions.act_window">
+        <field name="name">Synchronisation Log</field>
+        <field name="res_model">sl.connector.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_failed': 1}</field>
+    </record>
+
+    <record id="view_sl_connector_mapping_list" model="ir.ui.view">
+        <field name="name">sl.connector.mapping.list</field>
+        <field name="model">sl.connector.mapping</field>
+        <field name="arch" type="xml">
+            <list string="Linked Records" create="false">
+                <field name="model_name"/>
+                <field name="res_id"/>
+                <field name="external_id"/>
+                <field name="external_written" optional="hide"/>
+                <field name="synced_on"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sl_connector_mapping" model="ir.actions.act_window">
+        <field name="name">Linked Records</field>
+        <field name="res_model">sl.connector.mapping</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem id="menu_sl_connector_root" name="Connectors"
+              parent="base.menu_custom" sequence="80"
+              groups="base.group_system"/>
+    <menuitem id="menu_sl_connector_log" name="Synchronisation Log"
+              parent="menu_sl_connector_root" action="action_sl_connector_log"
+              sequence="10"/>
+    <menuitem id="menu_sl_connector_mapping" name="Linked Records"
+              parent="menu_sl_connector_root"
+              action="action_sl_connector_mapping" sequence="20"/>
+
+</odoo>
