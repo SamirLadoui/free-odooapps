@@ -1,0 +1,110 @@
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h2 class="oe_slogan">Connector Base</h2>
+            <h3 class="oe_slogan">The shared half of any integration: links, log and retries</h3>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <p class="oe_mt32">Connecting Odoo to something else is mostly not about the something else. It is retries, back-off, timeouts, knowing what was already imported, and being able to say afterwards what happened. Every integration writes that part again, slightly differently, and gets it slightly wrong. This is that part, written once.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Key Features</h3>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">The link table</h4>
+            <p class="oe_mt8 text-center">Which Odoo record is which record over there, stored rather than guessed at. Without it the second sync creates a second copy of everything.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Matching that does not drift</h4>
+            <p class="oe_mt8 text-center">Names change and references get edited, so an integration that re-identifies records by matching text will eventually match the wrong ones. The link is written once and kept.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">A log that cannot be rewritten</h4>
+            <p class="oe_mt8 text-center">Every run leaves a line, and failures carry the message the other side actually sent rather than a paraphrase. A record of what happened that somebody can edit is not a record of what happened.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Asking politely</h4>
+            <p class="oe_mt8 text-center">Requests are retried when the answer says it is worth retrying - a 429, a 502, a dropped connection - and left alone when it is not, because asking again will not turn a 401 into a 200.</p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Testable without the other side</h4>
+            <p class="oe_mt8 text-center">Every real HTTP call goes through one method, so an integration built on this can be tested against recorded answers rather than a live service and a working network.</p>
+        </div>
+        <div class="oe_span6">
+            <h4 class="oe_centered oe_mt16">Yours to build on</h4>
+            <p class="oe_mt8 text-center">Inherit sl.connector.backend and the transport, the logging and the mapping helpers are already there.</p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Getting Started</h3>
+        <div class="oe_span12">
+            <ol style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Install the module. On its own it adds a link table and a log, and nothing else.</li>
+                <li class="oe_mt8">Install a connector that uses it, or inherit sl.connector.backend in your own code.</li>
+                <li class="oe_mt8">Watch Settings &gt; Technical &gt; Connectors for what the syncs are doing.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Good To Know</h3>
+        <div class="oe_span12">
+            <ul style="max-width: 760px; margin: 0 auto;">
+                <li class="oe_mt8">Old log lines are pruned weekly by a scheduled action, which you can turn off or re-time.</li>
+                <li class="oe_mt8">The link table is deliberately not tied to any particular connector, so one table serves all of them.</li>
+                <li class="oe_mt8">Nothing here talks to any service by itself; it is the shared machinery a connector uses.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <h3>Supported Odoo Versions</h3>
+            <p class="oe_mt16"><strong>14.0 &middot; 15.0 &middot; 16.0 &middot; 17.0 &middot; 18.0 &middot; 19.0</strong></p>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container oe_dark">
+    <div class="oe_row oe_spaced">
+        <h3 class="oe_span12 text-center">Contact Us</h3>
+        <div class="oe_span12 text-center">
+            <p class="oe_mt16">
+                If you have any queries or need support for this module, feel free to contact us.
+            </p>
+            <p class="oe_mt16">
+                <a href="https://www.linkedin.com/in/samir-ladoui" target="_blank" class="oe_social_media">
+                    <i class="fa fa-linkedin-square fa-2x"></i> LinkedIn: samir-ladoui
+                </a>
+                <a href="https://wa.me/+213658127254" target="_blank" class="oe_social_media"
+                    style="margin-left: 20px;">
+                    <i class="fa fa-whatsapp fa-2x"></i> WhatsApp: +213658127254
+                </a>
+            </p>
+            <p class="oe_mt8">
+                Email: <a href="mailto:samir.odoo.apps2325@gmail.com">samir.odoo.apps2325@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>
