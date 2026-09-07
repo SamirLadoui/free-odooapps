@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from datetime import date
+from datetime import date, datetime, timezone
 
 import requests
 from lxml import etree
@@ -22,6 +22,7 @@ ECB_NS = {
 # currency be chosen server-side.
 FRANKFURTER = 'https://api.frankfurter.app/latest'
 
+EXCHANGE_RATE_API = 'https://open.er-api.com/v6/latest/{currency}'
 
 class CurrencyRateProvider(models.Model):
     _name = 'sl.currency.rate.provider'
@@ -31,6 +32,7 @@ class CurrencyRateProvider(models.Model):
     name = fields.Char(compute='_compute_name', store=True)
     provider = fields.Selection(
         [('ecb', 'European Central Bank'),
+         ('exchange_rate_api', 'Exchange Rate'),
          ('frankfurter', 'Frankfurter (ECB data, JSON)')],
         default='ecb', required=True)
     company_id = fields.Many2one(
@@ -75,6 +77,12 @@ class CurrencyRateProvider(models.Model):
             response = requests.get(ECB_DAILY, timeout=TIMEOUT)
             response.raise_for_status()
             return response.content
+        elif self.provider == 'exchange_rate_api':
+            response = requests.get(EXCHANGE_RATE_API.format(
+                currency=self.company_id.currency_id.name
+            ), timeout=TIMEOUT)
+            response.raise_for_status()
+            return response.json()
         params = {'base': self.company_id.currency_id.name,
                   'symbols': ','.join(self.currency_ids.mapped('name'))}
         response = requests.get(FRANKFURTER, params=params, timeout=TIMEOUT)
@@ -100,6 +108,14 @@ class CurrencyRateProvider(models.Model):
         rates = dict(payload.get('rates') or {})
         rates[payload['base']] = 1.0
         return fields.Date.to_date(payload['date']), rates
+
+    @api.model
+    def _parse_exchange_rate_api(self, payload):
+        rates = dict(payload.get('rates') or {})
+        rates[payload['base_code']] = 1.0
+        rate_date = datetime.fromtimestamp(payload['time_last_update_unix'],
+                                tz=timezone.utc).date()
+        return rate_date, rates
 
     @api.model
     def _rebase(self, rates, base):
@@ -158,6 +174,8 @@ class CurrencyRateProvider(models.Model):
             payload = self._fetch()
             if self.provider == 'ecb':
                 rate_date, rates = self._parse_ecb(payload)
+            elif self.provider == 'exchange_rate_api':
+                rate_date, rates = self._parse_exchange_rate_api(payload)
             else:
                 rate_date, rates = self._parse_frankfurter(payload)
             rates = self._rebase(rates, self.company_id.currency_id.name)
