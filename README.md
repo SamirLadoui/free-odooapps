@@ -37,6 +37,7 @@ check it - run them with `--test-tags=/<module>`.
 | [`sl_pdf_watermark`](sl_pdf_watermark/) | **PDF Watermark** — Print DRAFT, PAID or anything else across a document | 13 |
 | [`sl_pos_return`](sl_pos_return/) | **Product Return In POS** — Give items back against a past receipt, from the till | 16 |
 | [`sl_product_brand`](sl_product_brand/) | **Product Brands** — Group products by brand, then filter and report on them | 9 |
+| [`sl_product_pack`](sl_product_pack/) | **Product Packs** — Sell one product and put its contents on the order | 19 |
 | [`sl_product_sequence`](sl_product_sequence/) | **Product Reference Numbering** — Give products an internal reference from a sequence | 15 |
 | [`sl_quality`](sl_quality/) | **Quality Management** — Non-conformities, root cause analysis and corrective actions | 20 |
 | [`sl_readonly_user`](sl_readonly_user/) | **Read Only User** — One group that lets a user see everything and change nothing | 14 |
