@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+import time
+
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
@@ -16,6 +19,17 @@ ECB_XML = b"""<?xml version="1.0" encoding="UTF-8"?>
     </Cube>
   </Cube>
 </gesmes:Envelope>"""
+
+# A trimmed copy of an open.er-api.com answer, so the third provider is
+# parsed without reaching the network either. The date arrives as a unix
+# stamp rather than a written date, which is the part worth pinning down.
+EXCHANGE_RATE_API_JSON = {
+    'result': 'success',
+    'base_code': 'USD',
+    'time_last_update_unix': 1772582400,
+    'time_last_update_utc': 'Wed, 04 Mar 2026 00:00:00 +0000',
+    'rates': {'USD': 1, 'EUR': 0.92, 'GBP': 0.78},
+}
 
 ECB_EMPTY = b"""<?xml version="1.0" encoding="UTF-8"?>
 <gesmes:Envelope xmlns:gesmes="http://www.gesmes.org/xml/2002-08-01"
@@ -66,6 +80,52 @@ class TestCurrencyRateUpdate(TransactionCase):
         self.assertEqual(str(rate_date), '2026-03-04')
         self.assertEqual(rates['USD'], 1.0)
         self.assertEqual(rates['EUR'], 0.92)
+
+    def test_parse_exchange_rate_api(self):
+        rate_date, rates = self.Provider._parse_exchange_rate_api(
+            EXCHANGE_RATE_API_JSON)
+        self.assertEqual(str(rate_date), '2026-03-04')
+        self.assertEqual(rates['EUR'], 0.92)
+        self.assertEqual(rates['GBP'], 0.78)
+        self.assertEqual(rates['USD'], 1.0,
+                         "the feed's own base must be included")
+
+    def test_the_base_currency_is_added_when_the_feed_leaves_it_out(self):
+        """The feed does quote its own base, but the parser does not lean on
+        that: a rate table with no entry for its base cannot be rebased, and
+        every rate that follows would be wrong."""
+        payload = dict(EXCHANGE_RATE_API_JSON,
+                       rates={'EUR': 0.92, 'GBP': 0.78})
+        _rate_date, rates = self.Provider._parse_exchange_rate_api(payload)
+        self.assertEqual(rates['USD'], 1.0)
+
+    def test_the_exchange_rate_api_date_is_read_as_utc(self):
+        """The stamp is seconds since the epoch, which is a moment, not a day.
+
+        Read in the server's own timezone it lands on the wrong date for
+        anyone east of London - so the check is made from Tokyo, where a
+        naive reading is a day ahead. On a server already running UTC the
+        two readings agree and nothing would be caught at all.
+        """
+        # 2026-03-04 23:30 UTC, which is 2026-03-05 in Tokyo.
+        payload = dict(EXCHANGE_RATE_API_JSON,
+                       time_last_update_unix=1772667000)
+        previous = os.environ.get('TZ')
+        os.environ['TZ'] = 'Asia/Tokyo'
+        time.tzset()
+        try:
+            rate_date, _rates = self.Provider._parse_exchange_rate_api(payload)
+        finally:
+            if previous is None:
+                os.environ.pop('TZ', None)
+            else:
+                os.environ['TZ'] = previous
+            time.tzset()
+        self.assertEqual(str(rate_date), '2026-03-04')
+
+    def test_the_exchange_rate_api_is_offered_as_a_provider(self):
+        offered = dict(self.Provider._fields['provider'].selection)
+        self.assertIn('exchange_rate_api', offered)
 
     # -- rebasing ----------------------------------------------------------
 
