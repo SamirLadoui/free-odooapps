@@ -121,12 +121,140 @@ class TestBiometricAttendance(TransactionCase):
         self.assertEqual(len(attendance), 1)
         self.assertFalse(attendance.check_out)
 
+    def test_later_download_closes_open_shift(self):
+        """Check-in and check-out may arrive in separate device downloads."""
+        self.device._process_punches([punch('1', self.day)])
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)])
+        self.assertEqual(len(attendance), 1)
+        self.assertFalse(attendance.check_out)
+        original_id = attendance.id
+        check_out = self.day + timedelta(hours=8)
+
+        created = self.device._process_punches([
+            punch('1', self.day), punch('1', check_out)])
+
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)])
+        self.assertEqual(created, 0, "closing a shift must not count as a new one")
+        self.assertEqual(attendance.ids, [original_id])
+        self.assertEqual(attendance.check_out, check_out)
+
     def test_result_is_recorded_on_the_device(self):
         self.device._process_punches([
             punch('1', self.day), punch('1', self.day + timedelta(hours=8))])
         self.assertEqual(self.device.last_state, 'ok')
         self.assertTrue(self.device.last_download)
         self.assertIn('1 attendance', self.device.last_message)
+
+    def test_later_download_preserves_existing_check_out(self):
+        """Do not replace a completed or manually corrected shift."""
+        check_out = self.day + timedelta(hours=7)
+        attendance = self.env['hr.attendance'].create({
+            'employee_id': self.alice.id,
+            'check_in': self.day, 'check_out': check_out})
+        created = self.device._process_punches([
+            punch('1', self.day), punch('1', self.day + timedelta(hours=8))])
+        self.assertEqual(created, 0)
+        self.assertEqual(attendance.check_out, check_out)
+        self.assertEqual(self.env['hr.attendance'].search_count([
+            ('employee_id', '=', self.alice.id)]), 1)
+
+    def test_partial_replay_does_not_reopen_completed_shift(self):
+        check_out = self.day + timedelta(hours=8)
+        self.device._process_punches([
+            punch('1', self.day), punch('1', check_out)])
+        self.device._process_punches([punch('1', self.day)])
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)])
+        self.assertEqual(len(attendance), 1)
+        self.assertEqual(attendance.check_out, check_out)
+
+    def test_incremental_downloads_complete_both_daily_shifts(self):
+        stamps = [self.day, self.day + timedelta(hours=4),
+                  self.day + timedelta(hours=5), self.day + timedelta(hours=9)]
+        for count in range(1, 5):
+            self.device._process_punches([punch('1', s) for s in stamps[:count]])
+        self.device._process_punches([punch('1', s) for s in stamps])
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)], order='check_in')
+        self.assertEqual(len(attendance), 2)
+        self.assertEqual(attendance.mapped('check_in'), [stamps[0], stamps[2]])
+        self.assertEqual(attendance.mapped('check_out'), [stamps[1], stamps[3]])
+
+    def test_later_checkout_does_not_close_another_employee(self):
+        self.device._process_punches([
+            punch('1', self.day), punch('2', self.day)])
+        self.device._process_punches([
+            punch('1', self.day), punch('1', self.day + timedelta(hours=8)),
+            punch('2', self.day)])
+        alice = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)])
+        bob = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.bob.id)])
+        self.assertEqual(alice.check_out, self.day + timedelta(hours=8))
+        self.assertFalse(bob.check_out)
+        self.assertEqual(len(alice | bob), 2)
+
+    def test_manual_download_completes_and_replays_open_shift(self):
+        """Mock only the terminal; use real import and attendance ORM."""
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+        check_in = SimpleNamespace(user_id='1', timestamp=self.day)
+        check_out = SimpleNamespace(
+            user_id='1', timestamp=self.day + timedelta(hours=8))
+        connection = Mock()
+        connection.get_attendance.side_effect = [
+            [check_in], [check_in, check_out], [check_in, check_out]]
+        with patch.object(type(self.device), '_connect', return_value=connection):
+            self.device.action_download()
+            original = self.env['hr.attendance'].search([
+                ('employee_id', '=', self.alice.id)])
+            self.assertFalse(original.check_out)
+            self.device.action_download()
+            self.device.action_download()
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)])
+        self.assertEqual(attendance.ids, original.ids)
+        self.assertEqual(attendance.check_out, check_out.timestamp)
+        self.assertEqual(connection.disconnect.call_count, 3)
+
+    def test_cron_completes_shift_when_another_device_is_offline(self):
+        """A failed terminal must not roll back a successful late checkout."""
+        from types import SimpleNamespace
+        from unittest.mock import Mock, patch
+
+        from odoo.addons.sl_biometric_attendance.models import biometric_device
+        offline = self.env['sl.biometric.device'].create({
+            'name': 'Offline warehouse', 'address': '192.0.2.99'})
+        # Isolate the cron's device selection inside this rollback-only test.
+        self.env['sl.biometric.device'].search([
+            ('id', 'not in', (self.device | offline).ids),
+        ]).write({'active': False})
+        check_in = SimpleNamespace(user_id='1', timestamp=self.day)
+        check_out = SimpleNamespace(
+            user_id='1', timestamp=self.day + timedelta(hours=8))
+        connection = Mock()
+        connection.get_attendance.side_effect = [[check_in], [check_in, check_out]]
+
+        def connect(device):
+            if device.id == offline.id:
+                raise UserError('Simulated offline QA terminal')
+            return connection
+
+        connection_patch = patch.object(
+            type(self.device), '_connect', autospec=True, side_effect=connect)
+        with connection_patch, self.assertLogs(
+                biometric_device.__name__, level='WARNING'):
+            self.env['sl.biometric.device']._cron_download()
+            self.env['sl.biometric.device']._cron_download()
+        attendance = self.env['hr.attendance'].search([
+            ('employee_id', '=', self.alice.id)])
+        self.assertEqual(len(attendance), 1)
+        self.assertEqual(attendance.check_out, check_out.timestamp)
+        self.assertEqual(self.device.last_state, 'ok')
+        self.assertEqual(offline.last_state, 'fail')
+        self.assertEqual(connection.disconnect.call_count, 2)
 
     # -- guards ------------------------------------------------------------
 
