@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_correction_list" model="ir.ui.view">
+        <field name="name">sl.attendance.correction.list</field>
+        <field name="model">sl.attendance.correction</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'submitted'" decoration-success="state == 'approved'" decoration-muted="state in ('rejected', 'cancelled')" duplicate="false">
+                <field name="employee_id"/>
+                <field name="attendance_id" optional="hide"/>
+                <field name="proposed_check_in"/>
+                <field name="proposed_check_out"/>
+                <field name="reason" optional="show"/>
+                <field name="submitted_at" optional="show"/>
+                <field name="decided_by" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_correction_form" model="ir.ui.view">
+        <field name="name">sl.attendance.correction.form</field>
+        <field name="model">sl.attendance.correction</field>
+        <field name="arch" type="xml">
+            <form string="Attendance Correction Request" duplicate="false">
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="btn-primary" invisible="state != 'draft' or not is_requester"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="not can_decide" confirm="Apply this proposal to Odoo Attendance using your current attendance permissions?"/>
+                    <button name="action_open_reject" type="object" string="Reject" invisible="not can_decide"/>
+                    <button name="action_cancel" type="object" string="Cancel Request" invisible="state not in ('draft', 'submitted') or not is_requester" confirm="Cancel this request? It cannot be reopened."/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <field name="is_requester" invisible="1"/>
+                    <field name="can_decide" invisible="1"/>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                        Select your existing attendance to correct it. Leave it empty only for a missing shift.
+                        Submission freezes your proposal; approval changes Odoo records, not device logs.
+                    </div>
+                    <div class="oe_title"><h1>Attendance Correction</h1></div>
+                    <group>
+                        <group>
+                            <field name="employee_id" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="requester_id" options="{'no_open': True}"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_open': True}"/>
+                        </group>
+                        <group string="Requested correction">
+                            <field name="attendance_id" domain="[('employee_id', '=', employee_id)]" options="{'no_create': True}" readonly="state != 'draft' or not is_requester"/>
+                            <field name="proposed_check_in" readonly="state != 'draft' or not is_requester"/>
+                            <field name="proposed_check_out" readonly="state != 'draft' or not is_requester"/>
+                        </group>
+                    </group>
+                    <group><field name="reason" placeholder="Explain the missing or incorrect attendance and provide supporting details." readonly="state != 'draft' or not is_requester"/></group>
+                    <group string="Submission snapshot" invisible="not submitted_at">
+                        <group>
+                            <field name="original_check_in"/>
+                            <field name="original_check_out"/>
+                        </group>
+                        <group>
+                            <field name="submitted_at"/>
+                            <field name="original_write_date" groups="base.group_no_one"/>
+                        </group>
+                    </group>
+                    <group string="Decision" invisible="state not in ('approved', 'rejected', 'cancelled')">
+                        <field name="decided_by" options="{'no_open': True}"/>
+                        <field name="decided_at"/>
+                        <field name="decision_reason"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_correction_search" model="ir.ui.view">
+        <field name="name">sl.attendance.correction.search</field>
+        <field name="model">sl.attendance.correction</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="reason"/>
+                <filter name="mine" string="My Requests" domain="[('requester_id', '=', uid)]"/>
+                <separator/>
+                <filter name="submitted" string="Awaiting Decision" domain="[('state', '=', 'submitted')]"/>
+                <filter name="draft" string="Drafts" domain="[('state', '=', 'draft')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <group>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_correction_reject_form" model="ir.ui.view">
+        <field name="name">sl.attendance.correction.reject.form</field>
+        <field name="model">sl.attendance.correction.reject</field>
+        <field name="arch" type="xml">
+            <form string="Reject Attendance Correction">
+                <group>
+                    <field name="request_id" options="{'no_open': True}"/>
+                    <field name="reason" placeholder="Explain why this request is being rejected."/>
+                </group>
+                <footer>
+                    <button name="action_reject" type="object" string="Reject Request" class="btn-primary"/>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_correction_requests" model="ir.actions.act_window">
+        <field name="name">Attendance Corrections</field>
+        <field name="res_model">sl.attendance.correction</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_correction_search"/>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Request an attendance correction</p><p>Explain the reason, propose both times, then submit for a native attendance approver.</p></field>
+    </record>
+    <menuitem id="menu_correction_root" name="Attendance Corrections" sequence="95" groups="base.group_user" web_icon="sl_attendance_correction,static/description/icon.png"/>
+    <menuitem id="menu_correction_requests" name="Requests" parent="menu_correction_root" action="action_correction_requests" sequence="10" groups="base.group_user"/>
+</odoo>
