@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_correction_company" model="ir.rule">
+        <field name="name">Attendance corrections: allowed companies</field>
+        <field name="model_id" ref="model_sl_attendance_correction"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_correction_own" model="ir.rule">
+        <field name="name">Attendance corrections: own requests</field>
+        <field name="model_id" ref="model_sl_attendance_correction"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[('requester_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_correction_all" model="ir.rule">
+        <field name="name">Attendance corrections: native attendance Officers and Administrators</field>
+        <field name="model_id" ref="model_sl_attendance_correction"/>
+        <field name="groups" eval="[(4, ref('hr_attendance.group_hr_attendance_user'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>
