@@ -169,6 +169,10 @@ class BiometricDevice(models.Model):
                 ('check_in', '=', pair['check_in']),
             ], limit=1)
             if existing:
+                # A previous download may have imported only the check-in.
+                # Complete it once; never overwrite an existing check-out.
+                if not existing.check_out and pair['check_out']:
+                    existing.write({'check_out': pair['check_out']})
                 continue
             values = {'employee_id': employee.id, 'check_in': pair['check_in']}
             if pair['check_out']:

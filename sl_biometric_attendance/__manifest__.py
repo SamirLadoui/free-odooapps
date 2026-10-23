@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Biometric Device Attendance',
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.0.1',
     'category': 'Human Resources/Attendances',
     'summary': 'Download attendance from ZKTeco biometric devices into Odoo',
     'description': """
