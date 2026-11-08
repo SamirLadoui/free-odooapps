@@ -1,8 +1,85 @@
 # -*- coding: utf-8 -*-
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
 
 HOURS_IN_DAY = 24.0
+
+
+class ShiftAssignmentGuard(models.Model):
+    _name = 'sl.shift.assignment.guard'
+    _description = 'Shift Assignment Mutation Coordination'
+
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True)
+    generation = fields.Integer(default=0)
+
+    _sql_constraints = [
+        ('employee_unique', 'UNIQUE(employee_id)', 'One assignment coordination row per employee.'),
+    ]
+
+    @api.model
+    def _sl_lock(self, employee_ids):
+        # Updating an addon-owned unique row makes stale REPEATABLE READ
+        # assignment writers serialize instead of both passing a search check.
+        for employee_id in sorted(set(employee_ids)):
+            if not employee_id:
+                continue
+            self.env.cr.execute('''
+                INSERT INTO sl_shift_assignment_guard (employee_id, generation)
+                VALUES (%s, 1)
+                ON CONFLICT (employee_id) DO UPDATE
+                SET generation = sl_shift_assignment_guard.generation + 1
+                RETURNING id
+            ''', (employee_id,))
+            self.env.cr.fetchone()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        raise AccessError(_('Assignment coordination rows are maintained internally.'))
+
+    def write(self, vals):
+        raise AccessError(_('Assignment coordination rows are maintained internally.'))
+
+    def unlink(self):
+        raise AccessError(_('Assignment coordination rows are maintained internally.'))
+
+
+class ShiftTemplateGuard(models.Model):
+    _name = 'sl.shift.template.guard'
+    _description = 'Shift Template and Assignment Coordination'
+
+    shift_id = fields.Many2one('sl.shift', required=True, ondelete='cascade', index=True)
+    generation = fields.Integer(default=0)
+
+    _sql_constraints = [
+        ('shift_unique', 'UNIQUE(shift_id)', 'One template coordination row per shift.'),
+    ]
+
+    @api.model
+    def _sl_lock(self, shift_ids):
+        # Template edits and assignment mutations update the same row. Under
+        # REPEATABLE READ, a stale participant loses rather than applying a
+        # policy change using a snapshot from before the other transaction.
+        for shift_id in sorted(set(shift_ids)):
+            if not shift_id:
+                continue
+            self.env.cr.execute('''
+                INSERT INTO sl_shift_template_guard (shift_id, generation)
+                VALUES (%s, 1)
+                ON CONFLICT (shift_id) DO UPDATE
+                SET generation = sl_shift_template_guard.generation + 1
+                RETURNING id
+            ''', (shift_id,))
+            self.env.cr.fetchone()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        raise AccessError(_('Template coordination rows are maintained internally.'))
+
+    def write(self, vals):
+        raise AccessError(_('Template coordination rows are maintained internally.'))
+
+    def unlink(self):
+        raise AccessError(_('Template coordination rows are maintained internally.'))
 
 
 class Shift(models.Model):
@@ -50,6 +127,11 @@ class Shift(models.Model):
     def _compute_assignment_count(self):
         for shift in self:
             shift.assignment_count = len(shift.assignment_ids)
+
+    def write(self, vals):
+        if {'start_time', 'end_time', 'break_minutes'}.intersection(vals):
+            self.env['sl.shift.template.guard']._sl_lock(self.ids)
+        return super().write(vals)
 
     @api.constrains('start_time', 'end_time')
     def _check_times(self):
@@ -103,6 +185,36 @@ class ShiftAssignment(models.Model):
         help="Leave empty for an assignment with no end date.")
     active = fields.Boolean(default=True)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        self.check_access_rights('create')
+        defaults = self.default_get(['employee_id', 'shift_id'])
+        employee_ids = [vals.get('employee_id', defaults.get('employee_id')) for vals in vals_list]
+        shift_ids = [vals.get('shift_id', defaults.get('shift_id')) for vals in vals_list]
+        self.env['sl.shift.assignment.guard']._sl_lock(employee_ids)
+        self.env['sl.shift.template.guard']._sl_lock(shift_ids)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        self.check_access_rights('write')
+        self.check_access_rule('write')
+        assignment_guard_fields = {'employee_id', 'date_from', 'date_to'}
+        if assignment_guard_fields.intersection(vals):
+            employee_ids = self.employee_id.ids
+            if vals.get('employee_id'):
+                employee_ids.append(vals['employee_id'])
+            self.env['sl.shift.assignment.guard']._sl_lock(employee_ids)
+        template_guard_fields = {
+            'employee_id', 'shift_id', 'date_from', 'date_to', 'active',
+            'attendance_policy', 'schedule_tz', 'workdays', 'break_window_set', 'break_start',
+        }
+        if template_guard_fields.intersection(vals):
+            shift_ids = self.mapped('shift_id').ids
+            if vals.get('shift_id'):
+                shift_ids.append(vals['shift_id'])
+            self.env['sl.shift.template.guard']._sl_lock(shift_ids)
+        return super().write(vals)
+
     @api.depends('employee_id', 'shift_id')
     def _compute_display_name(self):
         for assignment in self:
@@ -127,7 +239,7 @@ class ShiftAssignment(models.Model):
                 '|', ('date_to', '=', False),
                      ('date_to', '>=', assignment.date_from),
             ]
-            clash = self.search(domain, limit=1)
+            clash = self.with_context(active_test=False).search(domain, limit=1)
             if clash:
                 raise ValidationError(_(
                     "%(employee)s is already on %(shift)s from %(start)s.") % {

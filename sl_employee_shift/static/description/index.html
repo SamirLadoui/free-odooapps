@@ -26,7 +26,7 @@
         </div>
         <div class="oe_span6">
             <h4 class="oe_centered oe_mt16">Breaks Come Off The Total</h4>
-            <p class="oe_mt8 text-center">An unpaid break is deducted from the paid hours, on overnight shifts as well as ordinary ones, so what you see is what you pay.</p>
+            <p class="oe_mt8 text-center">An unpaid break is deducted from scheduled net duration. This is not a payslip calculation.</p>
         </div>
     </div>
     <div class="oe_row oe_spaced">
@@ -81,8 +81,17 @@
 <section class="oe_container">
     <div class="oe_row oe_spaced">
         <div class="oe_span12 text-center">
-            <h3>Supported Odoo Versions</h3>
-            <p class="oe_mt16"><strong>14.0 &middot; 15.0 &middot; 16.0 &middot; 17.0 &middot; 18.0 &middot; 19.0</strong></p>
+            <h3>Optional Attendance and Work Entries</h3>
+            <p>Base dependencies remain HR and Mail. Assignment alone does not change attendance or payroll.</p>
+            <p>Install sl_employee_shift_attendance for explicitly enabled historical net hours and role-gated overtime approval.
+               Configure timezone, shift-start workdays and an exact break window. Integration defaults off, including upgrades.</p>
+            <p>18:00–03:00 with one unpaid hour gives eight net regular hours and one logical presence.
+               18:00–05:00 gives eight regular plus two raw overtime hours, not automatically payable.</p>
+            <p>The optional sl_employee_shift_work_entry bridge creates real contract-based start/stop intervals excluding the break.
+               Select the exclusive manual contract source and explicitly map regular/overtime types. No salary rules,
+               statutory rates, UAE payslip, fixed-salary, hardware or browser certification is claimed.</p>
+            <h3>Supported Odoo Version</h3>
+            <p class="oe_mt16"><strong>Odoo 16.0</strong> — other release ports need independent verification.</p>
         </div>
     </div>
 </section>

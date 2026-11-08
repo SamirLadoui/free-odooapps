@@ -82,7 +82,7 @@ class TestEmployeeShift(TransactionCase):
     def test_assigning_a_shift(self):
         assignment = self._assign()
         self.assertEqual(assignment.shift_id, self.day)
-        self.employee.invalidate_cache(['current_shift_id'])
+        self.employee.invalidate_recordset(['current_shift_id'])
 
     def test_overlapping_assignments_are_refused(self):
         """Two at once and no report can say which shift somebody was on."""
@@ -90,6 +90,127 @@ class TestEmployeeShift(TransactionCase):
         with self.assertRaises(ValidationError):
             self._assign(shift_id=self.night.id,
                          date_from=self.today + timedelta(days=10))
+
+    def test_archived_assignment_still_blocks_overlapping_assignment(self):
+        archived = self._assign(date_to=self.today + timedelta(days=30))
+        archived.active = False
+        with self.assertRaises(ValidationError):
+            self._assign(shift_id=self.night.id,
+                         date_from=self.today + timedelta(days=10))
+        self.env.cr.execute(
+            'SELECT count(*) FROM sl_shift_assignment WHERE employee_id = %s',
+            (self.employee.id,),
+        )
+        self.assertEqual(self.env.cr.fetchone()[0], 1)
+
+    def test_overlapping_assignment_creates_serialize_across_transactions(self):
+        import uuid
+
+        import psycopg2
+        from odoo import SUPERUSER_ID, api
+
+        registry = self.env.registry
+        token = uuid.uuid4().hex
+        employee_id = None
+        shift_ids = []
+        try:
+            with registry.cursor() as setup_cr:
+                setup_env = api.Environment(setup_cr, SUPERUSER_ID, {})
+                employee = setup_env['hr.employee'].create({
+                    'name': 'Synthetic assignment race ' + token,
+                })
+                shifts = setup_env['sl.shift'].create([
+                    {'name': 'Race shift A ' + token, 'start_time': 8, 'end_time': 16},
+                    {'name': 'Race shift B ' + token, 'start_time': 16, 'end_time': 23},
+                ])
+                employee_id, shift_ids = employee.id, shifts.ids
+                setup_cr.commit()
+
+            with registry.cursor() as first_cr, registry.cursor() as stale_cr:
+                first_env = api.Environment(first_cr, SUPERUSER_ID, {})
+                stale_env = api.Environment(stale_cr, SUPERUSER_ID, {})
+                for cr, env in ((first_cr, first_env), (stale_cr, stale_env)):
+                    cr.execute('SHOW transaction_isolation')
+                    self.assertEqual(cr.fetchone()[0], 'repeatable read')
+                    self.assertFalse(env['sl.shift.assignment'].with_context(active_test=False).search([
+                        ('employee_id', '=', employee_id),
+                    ]))
+                values = {
+                    'employee_id': employee_id, 'shift_id': shift_ids[0],
+                    'date_from': '2026-12-01', 'date_to': '2026-12-31',
+                }
+                first_env['sl.shift.assignment'].create(values)
+                first_cr.commit()
+                stale_writer_error = None
+                try:
+                    with stale_cr.savepoint():
+                        stale_env['sl.shift.assignment'].create(dict(values, shift_id=shift_ids[1]))
+                except psycopg2.errors.SerializationFailure:
+                    stale_writer_error = 'serialization'
+                except ValidationError:
+                    stale_writer_error = 'overlap'
+                else:
+                    stale_cr.commit()
+
+            with registry.cursor() as verify_cr:
+                verify_env = api.Environment(verify_cr, SUPERUSER_ID, {})
+                rows = verify_env['sl.shift.assignment'].with_context(active_test=False).search([
+                    ('employee_id', '=', employee_id),
+                ])
+                self.assertEqual(len(rows), 1,
+                                 'Concurrent overlapping creates must not both commit')
+                verify_cr.execute("SELECT to_regclass('public.sl_shift_assignment_guard')")
+                guard_table = bool(verify_cr.fetchone()[0])
+                if guard_table:
+                    self.assertEqual(stale_writer_error, 'serialization')
+
+            with registry.cursor() as retry_cr:
+                retry_env = api.Environment(retry_cr, SUPERUSER_ID, {})
+                with self.assertRaises(ValidationError):
+                    with retry_cr.savepoint():
+                        retry_env['sl.shift.assignment'].create({
+                            'employee_id': employee_id, 'shift_id': shift_ids[1],
+                            'date_from': '2026-12-10', 'date_to': '2026-12-20',
+                        })
+                retry_env['sl.shift.assignment'].create({
+                    'employee_id': employee_id, 'shift_id': shift_ids[1],
+                    'date_from': '2027-01-01', 'date_to': '2027-01-31',
+                })
+                retry_cr.commit()
+
+            with registry.cursor() as verify_cr:
+                verify_env = api.Environment(verify_cr, SUPERUSER_ID, {})
+                rows = verify_env['sl.shift.assignment'].with_context(active_test=False).search([
+                    ('employee_id', '=', employee_id),
+                ])
+                self.assertEqual(len(rows), 2)
+                verify_cr.execute("SELECT to_regclass('public.sl_shift_assignment_guard')")
+                if verify_cr.fetchone()[0]:
+                    verify_cr.execute(
+                        'SELECT generation FROM sl_shift_assignment_guard WHERE employee_id = %s',
+                        (employee_id,),
+                    )
+                    self.assertEqual(verify_cr.fetchone()[0], 2)
+                    verify_cr.execute("""
+                        SELECT EXISTS (
+                            SELECT 1 FROM pg_constraint
+                            WHERE conrelid = 'sl_shift_assignment_guard'::regclass
+                              AND contype = 'u'
+                              AND pg_get_constraintdef(oid) = 'UNIQUE (employee_id)'
+                        )
+                    """)
+                    self.assertTrue(verify_cr.fetchone()[0],
+                                    'The module-owned coordination row must be unique per employee')
+        finally:
+            if employee_id:
+                with registry.cursor() as cleanup_cr:
+                    cleanup_env = api.Environment(cleanup_cr, SUPERUSER_ID, {})
+                    cleanup_env['sl.shift.assignment'].with_context(active_test=False).search([
+                        ('employee_id', '=', employee_id),
+                    ]).unlink()
+                    cleanup_env['sl.shift'].browse(shift_ids).unlink()
+                    cleanup_env['hr.employee'].browse(employee_id).unlink()
+                    cleanup_cr.commit()
 
     def test_an_open_ended_assignment_blocks_later_ones(self):
         self._assign()
@@ -117,23 +238,23 @@ class TestEmployeeShift(TransactionCase):
         today = date.today()
         self._assign(date_from=today - timedelta(days=1),
                      date_to=today + timedelta(days=1))
-        self.employee.invalidate_cache(['current_shift_id'])
+        self.employee.invalidate_recordset(['current_shift_id'])
         self.assertEqual(self.employee.current_shift_id, self.day)
 
     def test_no_current_shift_before_it_starts(self):
         today = date.today()
         self._assign(date_from=today + timedelta(days=5))
-        self.employee.invalidate_cache(['current_shift_id'])
+        self.employee.invalidate_recordset(['current_shift_id'])
         self.assertFalse(self.employee.current_shift_id)
 
     def test_no_current_shift_after_it_ends(self):
         today = date.today()
         self._assign(date_from=today - timedelta(days=10),
                      date_to=today - timedelta(days=1))
-        self.employee.invalidate_cache(['current_shift_id'])
+        self.employee.invalidate_recordset(['current_shift_id'])
         self.assertFalse(self.employee.current_shift_id)
 
     def test_an_open_ended_assignment_is_current(self):
         self._assign(date_from=date.today() - timedelta(days=1))
-        self.employee.invalidate_cache(['current_shift_id'])
+        self.employee.invalidate_recordset(['current_shift_id'])
         self.assertEqual(self.employee.current_shift_id, self.day)

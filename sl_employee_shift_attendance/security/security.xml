@@ -1,0 +1,16 @@
+<odoo>
+    <record id="group_shift_approver" model="res.groups">
+        <field name="name">Shift Overtime Approver</field>
+        <field name="implied_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_user'))]"/>
+    </record>
+    <record id="shift_day_company" model="ir.rule">
+        <field name="name">Logical shift company isolation</field>
+        <field name="model_id" ref="model_sl_shift_day"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="shift_audit_company" model="ir.rule">
+        <field name="name">Shift audit company isolation</field>
+        <field name="model_id" ref="model_sl_shift_audit"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

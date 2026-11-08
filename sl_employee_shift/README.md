@@ -7,7 +7,7 @@ Define your shifts once, assign people to them over time, and see who is on whic
 ## Features
 
 - **Overnight Shifts Are Eight Hours, Not Minus Sixteen** - A shift ending earlier than it starts runs past midnight, and the paid hours reflect that. Getting this wrong is how a night shift quietly ends up unpaid.
-- **Breaks Come Off The Total** - An unpaid break is deducted from the paid hours, on overnight shifts as well as ordinary ones, so what you see is what you pay.
+- **Breaks Come Off The Total** - An unpaid break is deducted from the scheduled net duration, on overnight shifts as well as ordinary ones. This is not a payslip calculation.
 - **One Shift At A Time** - An employee cannot hold two overlapping assignments. Two at once means no report can say which shift they were actually on, so the second is refused and the first is named.
 - **Permanent Or Temporary** - Leave the end date empty for a standing assignment, or set one for a temporary move. Consecutive assignments are fine; overlapping ones are not.
 - **Current Shift On The Employee** - Each employee shows the shift they are on today, worked out from the assignment dates rather than maintained by hand.
@@ -26,9 +26,24 @@ Define your shifts once, assign people to them over time, and see who is on whic
 - The paid hours shown are the shift length less the unpaid break.
 - Shift codes are unique so two spellings of one shift cannot split your reporting.
 
-## Supported Versions
+## Attendance and work entries are optional
 
-`14.0` `15.0` `16.0` `17.0` `18.0` `19.0`
+The base depends only on `hr` and `mail`. Scheduled Paid Hours do not change native
+attendance, work entries or payslips. Install `sl_employee_shift_attendance` and,
+if needed, `sl_employee_shift_work_entry` separately. Both integrations default
+off, including upgrades. Select historical timezone, shift-start workdays and an
+explicit break; UTC and Monday–Friday are defaults, not inferred client settings.
+
+18:00–03:00 with one unpaid hour gives eight regular net hours and one logical
+presence. 18:00–05:00 gives eight regular plus two raw overtime hours, subject to
+separate approval. The optional bridge produces real contract-based start/stop
+entries excluding the break, not salary rules or an additional overtime payment.
+Client-specific UAE payslips and fixed salary remain a separate acceptance gate.
+Read the companion READMEs before enabling historical assignments.
+
+## Supported Version
+
+This source tree targets **Odoo 16.0**. Other releases need independent native verification.
 
 ## License
 
