@@ -42,6 +42,7 @@ Also
     'depends': ['hr', 'mail'],
     'data': [
         'security/ir.model.access.csv',
+        'security/shift_security.xml',
         'views/shift_views.xml',
     ],
     'images': ['static/description/banner.png'],

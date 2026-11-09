@@ -1,0 +1,8 @@
+<odoo>
+    <!-- Native14 standalone work entries have no multi-company rule. -->
+    <record id="shift_work_entry_company" model="ir.rule">
+        <field name="name">Work entry company isolation</field>
+        <field name="model_id" ref="hr_work_entry.model_hr_work_entry"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

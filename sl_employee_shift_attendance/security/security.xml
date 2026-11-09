@@ -1,0 +1,36 @@
+<odoo>
+    <record id="group_shift_approver" model="res.groups">
+        <field name="name">Shift Overtime Approver</field>
+        <field name="implied_ids" eval="[(5, 0, 0)]"/>
+    </record>
+    <record id="shift_attendance_approver_company" model="ir.rule">
+        <field name="name">Shift approver managed attendance by company</field>
+        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+        <field name="domain_force">[('employee_id.company_id', 'in', company_ids), ('sl_shift_day_id', '!=', False)]</field>
+        <field name="groups" eval="[(4, ref('group_shift_approver'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="shift_attendance_approver_global_read" model="ir.rule">
+        <field name="name">Shift approver cannot read unrelated attendance</field>
+        <field name="model_id" ref="hr_attendance.model_hr_attendance"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('sl_shift_day_id', '!=', False)] if user.has_group('sl_employee_shift_attendance.group_shift_approver') and not user.has_group('hr_attendance.group_hr_attendance_user') else [(1, '=', 1)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="shift_day_company" model="ir.rule">
+        <field name="name">Logical shift company isolation</field>
+        <field name="model_id" ref="model_sl_shift_day"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="shift_audit_company" model="ir.rule">
+        <field name="name">Shift audit company isolation</field>
+        <field name="model_id" ref="model_sl_shift_audit"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
