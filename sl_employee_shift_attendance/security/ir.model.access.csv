@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_shift_guard_internal_only,shift.guard.internal,model_sl_shift_guard,base.group_system,0,0,0,0
+access_shift_template_guard_internal_only,shift.template.guard.internal,model_sl_shift_template_guard,base.group_user,0,0,0,0
+access_shift_decision,shift.decision.approver,model_sl_shift_decision,sl_employee_shift_attendance.group_shift_approver,1,1,1,1
+access_shift_day_approver,shift.day.approver,model_sl_shift_day,sl_employee_shift_attendance.group_shift_approver,1,0,0,0
+access_shift_day_attendance,shift.day.attendance,model_sl_shift_day,hr_attendance.group_hr_attendance_user,1,0,0,0
+access_shift_day_hr,shift.day.hr,model_sl_shift_day,hr.group_hr_user,1,0,0,0
+access_shift_audit_approver,shift.audit.approver,model_sl_shift_audit,sl_employee_shift_attendance.group_shift_approver,1,0,0,0
+access_shift_audit_attendance,shift.audit.attendance,model_sl_shift_audit,hr_attendance.group_hr_attendance_user,1,0,0,0
+access_shift_audit_hr,shift.audit.hr,model_sl_shift_audit,hr.group_hr_user,1,0,0,0

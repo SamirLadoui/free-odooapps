@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
 
 HOURS_IN_DAY = 24.0
 
@@ -83,6 +83,45 @@ class Shift(models.Model):
                 raise ValidationError(_("Shift code '%s' is already used.") % shift.code)
 
 
+class ShiftAssignmentGuard(models.Model):
+    """Module-owned per-employee write version for assignment overlap checks."""
+    _name = 'sl.shift.assignment.guard'
+    _description = 'Shift Assignment Coordination'
+
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True)
+    generation = fields.Integer(default=0)
+
+    _employee_unique = models.Constraint('UNIQUE(employee_id)', 'One coordination row per employee.')
+
+    @api.model
+    def _lock_for_employees(self, employee_ids):
+        """Update the module-owned row so repeatable-read writers serialize.
+
+        A parent-row SELECT FOR UPDATE cannot refresh a transaction's existing
+        snapshot. The revision upsert makes a stale competing writer receive a
+        PostgreSQL serialization failure before it checks overlap.
+        """
+        for employee_id in sorted({employee_id for employee_id in employee_ids if employee_id}):
+            self.env.cr.execute('''
+                INSERT INTO sl_shift_assignment_guard (employee_id, generation)
+                VALUES (%s, 1)
+                ON CONFLICT (employee_id) DO UPDATE
+                SET generation = sl_shift_assignment_guard.generation + 1
+                RETURNING id
+            ''', (employee_id,))
+            self.env.cr.fetchone()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        raise AccessError(_('Assignment coordination rows are maintained internally.'))
+
+    def write(self, vals):
+        raise AccessError(_('Assignment coordination rows are maintained internally.'))
+
+    def unlink(self):
+        raise AccessError(_('Assignment coordination rows are maintained internally.'))
+
+
 class ShiftAssignment(models.Model):
     _name = 'sl.shift.assignment'
     _description = 'Shift Assignment'
@@ -102,6 +141,24 @@ class ShiftAssignment(models.Model):
         string='To', tracking=True,
         help="Leave empty for an assignment with no end date.")
     active = fields.Boolean(default=True)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_employee_id = self.env.context.get('default_employee_id') or self.default_get(['employee_id']).get('employee_id')
+        employee_ids = {
+            vals.get('employee_id') or default_employee_id
+            for vals in vals_list
+        }
+        self.env['sl.shift.assignment.guard']._lock_for_employees(employee_ids)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if {'employee_id', 'date_from', 'date_to'}.intersection(vals):
+            employee_ids = self.employee_id.ids
+            if vals.get('employee_id'):
+                employee_ids.append(vals['employee_id'])
+            self.env['sl.shift.assignment.guard']._lock_for_employees(employee_ids)
+        return super().write(vals)
 
     @api.depends('employee_id', 'shift_id')
     def _compute_display_name(self):
@@ -127,7 +184,7 @@ class ShiftAssignment(models.Model):
                 '|', ('date_to', '=', False),
                      ('date_to', '>=', assignment.date_from),
             ]
-            clash = self.search(domain, limit=1)
+            clash = self.with_context(active_test=False).search(domain, limit=1)
             if clash:
                 raise ValidationError(_(
                     "%(employee)s is already on %(shift)s from %(start)s.") % {

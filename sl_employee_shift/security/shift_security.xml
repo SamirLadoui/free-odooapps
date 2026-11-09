@@ -1,0 +1,7 @@
+<odoo>
+    <record id="shift_assignment_company" model="ir.rule">
+        <field name="name">Shift assignment company isolation</field>
+        <field name="model_id" ref="model_sl_shift_assignment"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
