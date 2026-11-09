@@ -127,7 +127,7 @@ class ShiftAssignment(models.Model):
                 '|', ('date_to', '=', False),
                      ('date_to', '>=', assignment.date_from),
             ]
-            clash = self.search(domain, limit=1)
+            clash = self.with_context(active_test=False).search(domain, limit=1)
             if clash:
                 raise ValidationError(_(
                     "%(employee)s is already on %(shift)s from %(start)s.") % {

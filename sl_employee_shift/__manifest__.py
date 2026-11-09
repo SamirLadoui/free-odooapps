@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Employee Shifts',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.1.0',
     'category': 'Human Resources',
     'summary': 'Define work shifts and assign employees to them over time',
     'description': """
@@ -42,6 +42,7 @@ Also
     'depends': ['hr', 'mail'],
     'data': [
         'security/ir.model.access.csv',
+        'security/shift_security.xml',
         'views/shift_views.xml',
     ],
     'images': ['static/description/banner.png'],

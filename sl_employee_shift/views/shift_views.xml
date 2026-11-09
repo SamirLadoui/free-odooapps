@@ -90,6 +90,38 @@
         </field>
     </record>
 
+    <record id="view_shift_assignment_form" model="ir.ui.view">
+        <field name="name">sl.shift.assignment.form</field>
+        <field name="model">sl.shift.assignment</field>
+        <field name="arch" type="xml">
+            <form string="Shift Assignment">
+                <sheet>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="company_id" readonly="1"/>
+                        <field name="shift_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="active"/>
+                    </group>
+                    <group name="historical_schedule" string="Historical Schedule">
+                        <field name="schedule_tz"/>
+                        <field name="workdays"/>
+                        <field name="break_window_set"/>
+                        <field name="break_start" widget="float_time"/>
+                    </group>
+                    <div class="alert alert-info" role="status">
+                        This assignment describes a shift, not a payroll calendar.
+                        Attendance and work-entry integration require the optional
+                        bridge modules and explicit enablement. UTC and Monday–Friday
+                        are configurable defaults, not inferred client settings.
+                    </div>
+                </sheet>
+                <div class="oe_chatter"><field name="message_follower_ids"/><field name="message_ids"/></div>
+            </form>
+        </field>
+    </record>
+
     <record id="view_shift_assignment_search" model="ir.ui.view">
         <field name="name">sl.shift.assignment.search</field>
         <field name="model">sl.shift.assignment</field>
@@ -102,7 +134,7 @@
                         domain="[('date_from', '&lt;=', 'today'),
                                  '|', ('date_to', '=', False),
                                       ('date_to', '&gt;=', 'today')]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_shift" string="Shift"
                             context="{'group_by': 'shift_id'}"/>
                     <filter name="group_department" string="Department"

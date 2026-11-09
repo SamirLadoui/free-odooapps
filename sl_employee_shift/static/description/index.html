@@ -26,7 +26,7 @@
         </div>
         <div class="oe_span6">
             <h4 class="oe_centered oe_mt16">Breaks Come Off The Total</h4>
-            <p class="oe_mt8 text-center">An unpaid break is deducted from the paid hours, on overnight shifts as well as ordinary ones, so what you see is what you pay.</p>
+            <p class="oe_mt8 text-center">An unpaid break reduces the scheduled net duration. The base catalogue alone does not change attendance, overtime, work entries or payroll.</p>
         </div>
     </div>
     <div class="oe_row oe_spaced">
@@ -81,8 +81,11 @@
 <section class="oe_container">
     <div class="oe_row oe_spaced">
         <div class="oe_span12 text-center">
-            <h3>Supported Odoo Versions</h3>
-            <p class="oe_mt16"><strong>14.0 &middot; 15.0 &middot; 16.0 &middot; 17.0 &middot; 18.0 &middot; 19.0</strong></p>
+            <h3>Odoo 17 Historical Schedule</h3>
+            <p class="oe_mt16"><strong>17.0</strong> &mdash; sibling releases require their own native verification.</p>
+            <p>Assignments include timezone, shift-start weekdays and explicit break windows. Today's current-shift display is not used to resolve historical punches.</p>
+            <p>The optional Employee Shift Attendance companion supplies an explicitly enabled custom net-hours and overtime approval policy. Employee Shift Work Entries separately exports regular and approved overtime as native net intervals. Both integrations default off; the base remains HR/mail only.</p>
+            <p>18:00&ndash;03:00 with a one-hour break means eight scheduled net hours. Actual timestamps remain unchanged. This is not a statutory salary rule or a certified client payslip; no original client spreadsheet or licensed client payroll is supplied.</p>
         </div>
     </div>
 </section>
