@@ -1,0 +1,82 @@
+<odoo>
+    <record id="group_shift_approver" model="res.groups">
+        <field name="name">Shift Overtime Approver</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="shift_day_company" model="ir.rule">
+        <field name="name">Logical shift company isolation</field>
+        <field name="model_id" ref="model_sl_shift_day"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="shift_audit_company" model="ir.rule">
+        <field name="name">Shift audit company isolation</field>
+        <field name="model_id" ref="model_sl_shift_audit"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- Native Attendance Officers see only employees assigned to them. -->
+    <record id="shift_day_attendance_officer" model="ir.rule">
+        <field name="name">Shift summaries for managed employees</field>
+        <field name="model_id" ref="model_sl_shift_day"/>
+        <field name="domain_force">[('employee_id.attendance_manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('hr_attendance.group_hr_attendance_officer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="shift_audit_attendance_officer" model="ir.rule">
+        <field name="name">Shift audits for managed employees</field>
+        <field name="model_id" ref="model_sl_shift_audit"/>
+        <field name="domain_force">[('day_id.employee_id.attendance_manager_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('hr_attendance.group_hr_attendance_officer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- The native Attendance Administrator retains company-wide read access. -->
+    <record id="shift_day_attendance_manager" model="ir.rule">
+        <field name="name">Attendance administrators read all shift summaries</field>
+        <field name="model_id" ref="model_sl_shift_day"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('hr_attendance.group_hr_attendance_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="shift_audit_attendance_manager" model="ir.rule">
+        <field name="name">Attendance administrators read all shift audits</field>
+        <field name="model_id" ref="model_sl_shift_audit"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('hr_attendance.group_hr_attendance_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Group rules are OR-combined: approvers keep full company scope even when they are officers. -->
+    <record id="shift_day_approver_scope" model="ir.rule">
+        <field name="name">Shift approvers read company shift summaries</field>
+        <field name="model_id" ref="model_sl_shift_day"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('sl_employee_shift_attendance.group_shift_approver'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+    <record id="shift_audit_approver_scope" model="ir.rule">
+        <field name="name">Shift approvers read company shift audits</field>
+        <field name="model_id" ref="model_sl_shift_audit"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('sl_employee_shift_attendance.group_shift_approver'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+</odoo>

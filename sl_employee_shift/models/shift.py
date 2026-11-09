@@ -1,8 +1,41 @@
 # -*- coding: utf-8 -*-
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
 
 HOURS_IN_DAY = 24.0
+
+
+class ShiftGuard(models.Model):
+    _name = 'sl.shift.guard'
+    _description = 'Shift Mutation Coordination'
+
+    employee_id = fields.Many2one('hr.employee', required=True, ondelete='cascade', index=True)
+    generation = fields.Integer(default=0)
+    _sql_constraints = [('employee_unique', 'UNIQUE(employee_id)', 'One coordination row per employee.')]
+
+    @api.model
+    def _sl_lock(self, employee_ids):
+        # Updating an owned coordination row makes stale REPEATABLE READ
+        # writers serialize/retry; SELECT FOR UPDATE on unchanged HR rows does not.
+        for employee_id in sorted(set(employee_ids)):
+            self.env.cr.execute('''
+                INSERT INTO sl_shift_guard (employee_id, generation)
+                VALUES (%s, 1)
+                ON CONFLICT (employee_id) DO UPDATE
+                SET generation = sl_shift_guard.generation + 1
+                RETURNING id
+            ''', (employee_id,))
+            self.env.cr.fetchone()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        raise AccessError(_('Coordination rows are maintained internally.'))
+
+    def write(self, vals):
+        raise AccessError(_('Coordination rows are maintained internally.'))
+
+    def unlink(self):
+        raise AccessError(_('Coordination rows are maintained internally.'))
 
 
 class Shift(models.Model):
@@ -127,13 +160,30 @@ class ShiftAssignment(models.Model):
                 '|', ('date_to', '=', False),
                      ('date_to', '>=', assignment.date_from),
             ]
-            clash = self.search(domain, limit=1)
+            clash = self.with_context(active_test=False).search(domain, limit=1)
             if clash:
                 raise ValidationError(_(
                     "%(employee)s is already on %(shift)s from %(start)s.") % {
                         'employee': assignment.employee_id.name,
                         'shift': clash.shift_id.name,
                         'start': clash.date_from})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        employee_ids = [
+            values.get('employee_id') or self.env.context.get('default_employee_id')
+            for values in vals_list
+        ]
+        self.env['sl.shift.guard']._sl_lock([employee_id for employee_id in employee_ids if employee_id])
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if {'employee_id', 'date_from', 'date_to'}.intersection(vals):
+            employee_ids = self.employee_id.ids
+            if vals.get('employee_id'):
+                employee_ids.append(vals['employee_id'])
+            self.env['sl.shift.guard']._sl_lock(employee_ids)
+        return super().write(vals)
 
 
 class HrEmployee(models.Model):
