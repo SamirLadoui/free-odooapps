@@ -1,0 +1,123 @@
+<odoo>
+    <record id="view_assignment_attendance_form" model="ir.ui.view">
+        <field name="name">sl.shift.assignment.attendance.form</field>
+        <field name="model">sl.shift.assignment</field>
+        <field name="inherit_id" ref="sl_employee_shift.view_shift_assignment_form"/>
+        <field name="arch" type="xml">
+            <group name="historical_schedule" position="after">
+                <group name="attendance_integration" string="Opt-in Attendance Integration">
+                    <field name="attendance_policy"/>
+                    <div class="alert alert-warning" role="status" attrs="{'invisible': [('attendance_policy', '=', 'off')]}">
+                        The custom shift engine is authoritative for eligible shift
+                        dates. Native overtime is not also generated. Approval is
+                        always required before overtime is exported. Preview historical
+                        corrections before enabling; modified native daily overtime must be
+                        reconciled through its own authorized workflow first.
+                    </div>
+                </group>
+            </group>
+        </field>
+    </record>
+    <record id="view_shift_day_list" model="ir.ui.view">
+        <field name="name">sl.shift.day.list</field>
+        <field name="model">sl.shift.day</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0">
+                <field name="employee_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="shift_date"/>
+                <field name="state"/>
+                <field name="elapsed_hours" widget="float_time"/>
+                <field name="net_hours" widget="float_time"/>
+                <field name="regular_hours" widget="float_time"/>
+                <field name="raw_overtime_hours" widget="float_time"/>
+                <field name="approved_overtime_hours" widget="float_time"/>
+                <field name="presence_days"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_shift_day_form" model="ir.ui.view">
+        <field name="name">sl.shift.day.form</field>
+        <field name="model">sl.shift.day</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <header>
+                    <button name="action_open_decision" type="object" string="Approve / Refuse Overtime"
+                            groups="sl_employee_shift_attendance.group_shift_approver" attrs="{'invisible': [('state', 'in', ['open', 'void'])]}"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="assignment_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="shift_date"/>
+                        <field name="start"/>
+                        <field name="stop"/>
+                        <field name="presence_days"/>
+                    </group>
+                    <group name="hours" string="Hours (no statutory rates)">
+                        <field name="expected_hours" widget="float_time"/>
+                        <field name="elapsed_hours" widget="float_time"/>
+                        <field name="net_hours" widget="float_time"/>
+                        <field name="regular_hours" widget="float_time"/>
+                        <field name="raw_overtime_hours" widget="float_time"/>
+                        <field name="approved_overtime_hours" widget="float_time"/>
+                        <field name="approver_id"/>
+                        <field name="approved_at"/>
+                        <field name="decision_reason"/>
+                    </group>
+                    <notebook>
+                        <page string="Original Punches">
+                            <field name="attendance_ids" readonly="1">
+                                <tree create="0" edit="0" delete="0">
+                                    <field name="check_in"/>
+                                    <field name="check_out"/>
+                                    <field name="sl_elapsed_hours" widget="float_time"/>
+                                    <field name="worked_hours" widget="float_time"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Immutable Audit">
+                            <field name="audit_ids" readonly="1">
+                                <tree create="0" edit="0" delete="0">
+                                    <field name="actor_id"/>
+                                    <field name="occurred_at"/>
+                                    <field name="event"/>
+                                    <field name="reason"/>
+                                </tree>
+                            </field>
+                            <field name="digest"/>
+                            <field name="evidence"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_shift_decision_form" model="ir.ui.view">
+        <field name="name">sl.shift.decision.form</field>
+        <field name="model">sl.shift.decision</field>
+        <field name="arch" type="xml">
+            <form string="Decide Shift Overtime">
+                <group>
+                    <field name="day_id"/>
+                    <field name="decision"/>
+                    <field name="hours" widget="float_time" attrs="{'invisible': [('decision', '!=', 'approve')]}"/>
+                    <field name="reason"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm Decision" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_shift_day" model="ir.actions.act_window">
+        <field name="name">Logical Shift Attendance</field>
+        <field name="res_model">sl.shift.day</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_shift_day" name="Logical Shift Attendance" parent="hr.menu_hr_root"
+              action="action_shift_day" sequence="49" groups="hr_attendance.group_hr_attendance_user,hr.group_hr_user"/>
+</odoo>

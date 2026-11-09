@@ -26,6 +26,28 @@ Define your shifts once, assign people to them over time, and see who is on whic
 - The paid hours shown are the shift length less the unpaid break.
 - Shift codes are unique so two spellings of one shift cannot split your reporting.
 
+## Optional historical attendance and work entries (Odoo 15)
+
+The base catalogue depends only on `hr` and `mail`: displayed paid shift hours do
+not by themselves change imported attendance, approve overtime or calculate salary.
+Historical assignments additionally store schedule timezone, shift-start weekdays
+and an explicitly confirmed unpaid-break window. The current-shift display remains
+for today only.
+
+Install `sl_employee_shift_attendance` separately for opt-in historical net hours,
+one logical presence anchor and audited overtime approval. It defaults off; native
+behavior remains unchanged without an eligible opted-in assignment. Install
+`sl_employee_shift_work_entry` separately for provider-neutral explicit manual
+export of regular and **approved** overtime into native Odoo 15 start/stop contract
+work entries. Both the assignment and the effective contract source must be selected
+explicitly. Read each companion's README before enabling historical corrections.
+
+The fixture 18:00–03:00 with one confirmed unpaid hour yields eight regular hours,
+zero overtime and one logical shift presence; 18:00–05:00 yields eight regular and
+two raw overtime hours, not eleven overtime hours. These are configured-policy
+examples, not statutory UAE salary rules. No production repair, licensed payroll
+provider or real client payslip is certified by this catalogue.
+
 ## Supported Versions
 
 `14.0` `15.0` `16.0` `17.0` `18.0` `19.0`

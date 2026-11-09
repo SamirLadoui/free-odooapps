@@ -103,6 +103,26 @@ class ShiftAssignment(models.Model):
         help="Leave empty for an assignment with no end date.")
     active = fields.Boolean(default=True)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_employee_id = self.default_get(['employee_id']).get('employee_id')
+        employee_ids = [vals.get('employee_id') or default_employee_id for vals in vals_list]
+        with self.env.cr.savepoint():
+            self.env['sl.shift.guard']._sl_lock(employee_ids)
+            return super().create(vals_list)
+
+    def write(self, vals):
+        if {'employee_id', 'date_from', 'date_to'}.intersection(vals):
+            self.check_access_rights('write')
+            self.check_access_rule('write')
+            employee_ids = self.employee_id.ids
+            if vals.get('employee_id'):
+                employee_ids.append(vals['employee_id'])
+            with self.env.cr.savepoint():
+                self.env['sl.shift.guard']._sl_lock(employee_ids)
+                return super().write(vals)
+        return super().write(vals)
+
     @api.depends('employee_id', 'shift_id')
     def _compute_display_name(self):
         for assignment in self:
@@ -127,7 +147,7 @@ class ShiftAssignment(models.Model):
                 '|', ('date_to', '=', False),
                      ('date_to', '>=', assignment.date_from),
             ]
-            clash = self.search(domain, limit=1)
+            clash = self.with_context(active_test=False).search(domain, limit=1)
             if clash:
                 raise ValidationError(_(
                     "%(employee)s is already on %(shift)s from %(start)s.") % {

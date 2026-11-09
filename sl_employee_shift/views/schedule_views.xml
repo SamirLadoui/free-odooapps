@@ -1,0 +1,13 @@
+<odoo>
+    <record id="view_shift_assignment_form" model="ir.ui.view">
+        <field name="name">sl.shift.assignment.form</field><field name="model">sl.shift.assignment</field>
+        <field name="arch" type="xml"><form string="Shift Assignment"><sheet>
+            <group><field name="employee_id"/><field name="shift_id"/><field name="date_from"/><field name="date_to"/><field name="active"/></group>
+            <group name="historical_schedule" string="Historical Schedule (UTC by default)">
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="schedule_tz"/><field name="workdays"/><field name="break_window_set"/>
+                <field name="break_start" widget="float_time" attrs="{'invisible': [('break_window_set', '=', False)]}"/>
+            </group></sheet><div class="oe_chatter"><field name="message_follower_ids" widget="mail_followers" readonly="1"/><field name="message_ids" widget="mail_thread" readonly="1"/></div>
+        </form></field>
+    </record>
+</odoo>

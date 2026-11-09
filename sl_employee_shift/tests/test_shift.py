@@ -91,6 +91,15 @@ class TestEmployeeShift(TransactionCase):
             self._assign(shift_id=self.night.id,
                          date_from=self.today + timedelta(days=10))
 
+    def test_archived_assignment_still_blocks_overlapping_assignment(self):
+        archived = self._assign(date_to=self.today + timedelta(days=30))
+        archived.active = False
+        with self.assertRaises(ValidationError):
+            self._assign(date_from=self.today + timedelta(days=10),
+                         date_to=self.today + timedelta(days=40))
+        consecutive = self._assign(date_from=self.today + timedelta(days=31))
+        self.assertTrue(consecutive)
+
     def test_an_open_ended_assignment_blocks_later_ones(self):
         self._assign()
         with self.assertRaises(ValidationError):
